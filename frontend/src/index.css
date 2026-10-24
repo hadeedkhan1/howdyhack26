@@ -478,8 +478,8 @@ body { color: var(--ink); }
 .screen-content { padding-right: 18px; padding-left: 18px; }
 .page-heading { padding-top: 23px; }
 .page-heading h1, .section-heading h2, .deck-tools h2, .catch-modal h2, .clue-modal h2 { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-weight: 760; letter-spacing: -1.15px; }
-.page-heading h1 { color: #133842; text-shadow: 0 1px #ffffff75; }
-.eyebrow { color: #39757a; letter-spacing: 1.2px; }
+.page-heading h1 { color: #f4fbf8; text-shadow: 0 2px 12px #062b36b8, 0 1px 2px #062b3680; }
+.page-heading > .eyebrow { color: #e4f5ef; text-shadow: 0 1px 7px #062b36bd; letter-spacing: 1.2px; }
 .shell-footer { color: #47666b; }
 .panel, .date-choice, .window-card, .fishing-rating, .loading-card, .map-loading, .chart-loading {
   border: 1px solid #ffffffb8;
