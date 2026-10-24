@@ -26,3 +26,10 @@ Priorities, in order:
 Rules: plain JavaScript (ESM), no database, no auth, no new services. Convert times with
 America/Chicago (DST ends Nov 1, 2026). Read spots/species/regulations via services/data.js.
 Never change the API contract shape without updating AGENTS.md and telling the team.
+
+## Progress
+- tides.js (done): `getTides({ start, days })` returns per-day `tide` [{t UTC, ft}] and `hilo`
+  [{t, ft, type}] split on Chicago midnight (DST-safe helpers in services/time.js), plus
+  `waterTemp`, `salinity`, `missing`; never throws. Water temp is the latest NOAA reading,
+  not a forecast (>6h old -> "water_temperature" in missing); salinity isn't offered at
+  8771450, so it is always null and in `missing`. routes/plan.js must copy `missing` into each day.
