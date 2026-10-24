@@ -154,6 +154,13 @@ windows across spots. Label each input as "data" or "rule of thumb".
 - "caution": moderate rip risk, small craft advisory, high waves, heat index >= 103°F,
   wind > 20 mph, or ANY safety data missing or stale.
 - "go": none of the above. Display as "Go: no hazards flagged," never "safe."
+- Rip current risk: NWS Houston/Galveston (HGX) publishes no surf zone forecast. A Rip
+  Current Statement = high risk, a Beach Hazards Statement = moderate risk. If the NWS
+  alerts check succeeded and neither is active, that is NOT missing data: add an
+  info-level rip_current reason ("No rip current statement is active. Stay in shallow
+  water on the beach side.") that does not force caution. If the alerts check failed
+  (or is stale, or the day is past the ~48h alert horizon), rip risk is missing ->
+  caution.
 
 ## Principles
 - Missing data never counts as safe. Missing data means "caution."

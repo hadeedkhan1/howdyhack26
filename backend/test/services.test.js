@@ -259,11 +259,11 @@ test('nws: every request sends a User-Agent and asks for actual alerts only', as
   assert.deepEqual(zone.sort(), ['GMZ335', 'GMZ355'])
 })
 
-test('nws: a quiet day has no reasons, but unknown rip risk still lands in missing', async () => {
+test('nws: a quiet day has no reasons, and no rip statement is not missing (HGX has no SRF)', async () => {
   const r = await getAlerts({ start: today })
   assert.ok(Object.values(r.days[0].spots).every((x) => x.length === 0))
   assert.equal(r.days[0].rip, null)
-  assert.deepEqual(r.days[0].missing, ['rip_current'])
+  assert.deepEqual(r.days[0].missing, [])
 })
 
 test('nws: Rip Current Statement = "no" on the beach, caution on the pier, ignored in the bay', async () => {
@@ -317,7 +317,10 @@ test('nws: an alert with no "ends" uses "expires"; one with neither runs on', as
 
 test('nws: days more than 48h ahead get "nws_alerts" in missing (no alerts issued yet)', async () => {
   const r = await getAlerts({ start: addDays(today, 3), days: 2 })
-  for (const d of r.days) assert.ok(d.missing.includes('nws_alerts'), d.date)
+  for (const d of r.days) {
+    assert.ok(d.missing.includes('nws_alerts'), d.date)
+    assert.ok(d.missing.includes('rip_current'), `${d.date}: no statement yet says nothing about rip risk`)
+  }
 })
 
 test('nws: API down with no cache -> "nws_alerts" missing, never throws', async () => {

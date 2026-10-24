@@ -72,6 +72,26 @@ test('high rip risk -> "no", and the reason names the beach side only', () => {
   assert.match(pier.text, /High rip current risk/, 'pier reason does not downplay a high-risk statement')
 })
 
+test('no rip statement (HGX has no surf zone forecast) is info, not missing data', () => {
+  const r = safetyVerdict({ alerts: nwsDay([], { rip: null }), weather: weatherDay(), updatedAt })
+  assert.equal(r.verdict, 'go')
+  const rip = r.reasons.filter((x) => x.signal === 'rip_current')
+  assert.equal(rip.length, 1)
+  assert.equal(rip[0].level, 'info')
+  assert.equal(rip[0].text, 'No rip current statement is active. Stay in shallow water on the beach side.')
+  assert.equal(rip[0].updatedAt, sent)
+  assertContractShape(r)
+  // An active rip statement replaces the info reason.
+  const moderate = safetyVerdict({ alerts: nwsDay([alert('Beach Hazards Statement', 'BHS')], { rip: { level: 'moderate' } }), weather: weatherDay(), updatedAt })
+  assert.deepEqual(moderate.reasons.filter((x) => x.signal === 'rip_current').map((x) => x.level), ['moderate'])
+  // No info reason when the alert check failed, or with no beach spot to warn about.
+  const failed = safetyVerdict({ alerts: nwsDay([], { rip: null, missing: ['nws_alerts', 'rip_current'] }), weather: weatherDay(), updatedAt })
+  assert.equal(failed.verdict, 'caution')
+  assert.ok(!failed.reasons.some((x) => x.level === 'info'))
+  const bayOnly = spots.filter((s) => s.type === 'bay')
+  assert.ok(!safetyVerdict({ alerts: nwsDay(), weather: weatherDay(), updatedAt, spots: bayOnly }).reasons.some((x) => x.signal === 'rip_current'))
+})
+
 test('any missing safety input -> at least "caution"', () => {
   const cases = {
     'nws_alerts in missing': { alerts: nwsDay([], { missing: ['nws_alerts'] }), weather: weatherDay() },
@@ -101,8 +121,8 @@ test('non-safety missing data (water temp, bay waves) does not block "go"', () =
 test('nothing flagged -> "go", with reasons saying what was checked', () => {
   const r = safetyVerdict({ alerts: nwsDay(), weather: weatherDay(), updatedAt })
   assert.equal(r.verdict, 'go')
-  assert.deepEqual(signals(r).sort(), ['heat', 'nws_alerts', 'waves', 'wind'])
-  assert.ok(r.reasons.every((x) => ['none', 'low'].includes(x.level)))
+  assert.deepEqual(signals(r).sort(), ['heat', 'nws_alerts', 'rip_current', 'waves', 'wind'])
+  assert.ok(r.reasons.every((x) => ['none', 'low', 'info'].includes(x.level)))
   assert.ok(r.reasons.every((x) => x.updatedAt === sent))
   assertContractShape(r)
 })

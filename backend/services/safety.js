@@ -70,6 +70,7 @@ const ALERT_TEXT = {
 // nws.js rates a Rip Current Statement (high risk) as only "caution" on the pier, since you're
 // standing above the surf there. Say so instead of calling it moderate.
 const PIER_RIP_TEXT = "High rip current risk off the beach. You're above the water on the pier, but don't climb down or wade in."
+const RIP_NONE_TEXT = 'No rip current statement is active. Stay in shallow water on the beach side.'
 const GENERIC_ALERT = {
   no: 'The National Weather Service has a warning out for this area.',
   caution: 'The National Weather Service has an advisory out for this area.',
@@ -104,7 +105,7 @@ const latest = (a, b) => (!a ? b : !b ? a : a > b ? a : b)
 //   updatedAt: { nws, weather } ISO times for the "all clear" reasons
 //   spots: defaults to spots.json
 // Returns { verdict, reasons } in the API contract shape ({ signal, level, text, source, updatedAt }).
-// level: "high" (=> no), "moderate" (=> caution), "unknown" (missing => caution), "low"/"none" (fine).
+// level: "high" (=> no), "moderate" (=> caution), "unknown" (missing => caution), "low"/"none"/"info" (fine).
 export function safetyVerdict({ alerts, weather, missing = [], updatedAt = {}, spots = allSpots } = {}) {
   const reasons = []
   const add = (verdict, reason) => reasons.push({ verdict, ...reason })
@@ -159,6 +160,16 @@ export function safetyVerdict({ alerts, weather, missing = [], updatedAt = {}, s
   if (alerts && !gaps.has('nws_alerts') && merged.size === 0) {
     add('go', {
       signal: 'nws_alerts', level: 'none', text: 'No weather warnings or advisories for Galveston.',
+      source: NWS_SOURCE, updatedAt: updatedAt.nws ?? null,
+    })
+  }
+  // HGX publishes no surf zone forecast, so no rip statement is the normal case, not missing data.
+  // If the alert check worked, say so as info (doesn't force caution).
+  const ripKnown = alerts && !gaps.has('nws_alerts') && !gaps.has('rip_current')
+  const ripAlert = [...merged.values()].some((r) => r.signal === 'rip_current')
+  if (ripKnown && !ripAlert && spots.some((s) => s.type === 'surf')) {
+    add('go', {
+      signal: 'rip_current', level: 'info', text: RIP_NONE_TEXT,
       source: NWS_SOURCE, updatedAt: updatedAt.nws ?? null,
     })
   }

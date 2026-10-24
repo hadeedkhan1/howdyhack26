@@ -5,8 +5,10 @@
 // /products/types/SRF/locations has no HGX, and the nearest Texas SRF (CRP) covers only
 // Corpus Christi zones. HGX announces high rip risk as a "Rip Current Statement" alert
 // (Galveston Island = zone TXZ438) and moderate risk as a "Beach Hazards Statement". So an
-// active Rip Current Statement = "high", Beach Hazards Statement = "moderate"; otherwise the
-// risk is unknown and "rip_current" goes in `missing` (which forces caution).
+// active Rip Current Statement = "high", Beach Hazards Statement = "moderate". No SRF is normal,
+// so it is not missing data: if the alert check worked and neither statement is active, rip risk
+// is "none" (safety.js adds an info reason). Only when the alert check itself is missing (fetch
+// failed, stale, or past the alert horizon) does "rip_current" go in `missing` (forces caution).
 import { statSync } from 'node:fs'
 import { cachedJson, cacheFile } from './cache.js'
 import { spots as allSpots } from './data.js'
@@ -143,7 +145,8 @@ export function mapAlert(a, spotType) {
 //   spots: { <spotId>: { lat, lon, fallback, marineZone } }, source, updatedAt }
 // An alert applies to a day if its [onset, ends] overlaps that Chicago day. A day's `missing`
 // gets "nws_alerts" if any fetch failed, the data is stale, or the day is past the NWS alert
-// horizon; and "rip_current" if no rip risk is known for a surf spot. Never throws.
+// horizon; and "rip_current" too if that happens with no rip statement active for a surf spot.
+// Never throws.
 export async function getAlerts({ start, days = 1, spots = allSpots }) {
   const dates = Array.from({ length: days }, (_, i) => addDays(start, i))
   const now = Date.now()
@@ -199,7 +202,8 @@ export async function getAlerts({ start, days = 1, spots = allSpots }) {
         s.id, spotAlerts[s.id].filter(overlaps).map((a) => mapAlert(a, s.type)).filter(Boolean),
       ]))
 
-      // Rip Current Statement = high risk; Beach Hazards Statement = moderate. Neither = unknown.
+      // Rip Current Statement = high risk; Beach Hazards Statement = moderate. Neither = none
+      // (if the alert check worked; see `missing` below).
       const surfReasons = surfSpots.flatMap((s) => bySpot[s.id])
       const ripReason = surfReasons.find((r) => r.event === 'Rip Current Statement')
         ?? surfReasons.find((r) => r.event === 'Beach Hazards Statement')
@@ -209,8 +213,9 @@ export async function getAlerts({ start, days = 1, spots = allSpots }) {
       }
 
       const missing = []
-      if (failed || stale || from.getTime() - now > HORIZON_MS) missing.push('nws_alerts')
-      if (surfSpots.length && !rip) missing.push('rip_current')
+      const unchecked = failed || stale || from.getTime() - now > HORIZON_MS
+      if (unchecked) missing.push('nws_alerts')
+      if (unchecked && surfSpots.length && !rip) missing.push('rip_current')
       return { date, spots: bySpot, rip, missing }
     }),
     alerts: [...all.values()].map(summarize),

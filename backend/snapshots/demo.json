@@ -17,9 +17,9 @@
           },
           {
             "signal": "rip_current",
-            "level": "low",
-            "text": "Rip current risk is low on Gulf-facing beaches.",
-            "source": "NWS Surf Zone Forecast",
+            "level": "info",
+            "text": "No rip current statement is active. Stay in shallow water on the beach side.",
+            "source": "National Weather Service (api.weather.gov)",
             "updatedAt": "2026-10-30T20:10:00Z"
           },
           {
@@ -295,7 +295,7 @@
             "signal": "rip_current",
             "level": "moderate",
             "text": "Moderate rip current risk. Stay out of the water above your knees on the beach side.",
-            "source": "NWS Surf Zone Forecast",
+            "source": "National Weather Service (api.weather.gov)",
             "updatedAt": "2026-10-30T20:10:00Z"
           },
           {

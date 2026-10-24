@@ -7,7 +7,7 @@ import { addDays, chicagoMidnight } from '../services/time.js'
 export const SPOT_IDS = ['gisp-beach', 'gisp-bay', 'galveston-pier']
 export const SPECIES_IDS = ['croaker', 'whiting', 'sheepshead', 'black-drum', 'red-drum', 'speckled-trout', 'hardhead-catfish']
 export const VERDICTS = ['go', 'caution', 'no']
-export const LEVELS = ['none', 'low', 'moderate', 'high', 'unknown']
+export const LEVELS = ['none', 'low', 'info', 'moderate', 'high', 'unknown']
 export const LIKELIHOODS = ['high', 'medium', 'low']
 const RANK = { go: 0, caution: 1, no: 2 }
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/
@@ -35,7 +35,7 @@ export function checkSafety(safety, where) {
     assert.ok(RANK[safety.verdict] >= RANK.caution, `${where}: moderate/unknown reasons mean at least caution`)
   }
   if (safety.verdict === 'go') {
-    assert.ok(levels.every((l) => l === 'none' || l === 'low'), `${where}: "go" only with none/low reasons`)
+    assert.ok(levels.every((l) => ['none', 'low', 'info'].includes(l)), `${where}: "go" only with none/low/info reasons`)
     // AGENTS.md: show "Go: no hazards flagged", never "safe".
     for (const r of safety.reasons) assert.doesNotMatch(r.text, /\bsafe\b/i, `${where}: "go" text never says safe`)
   }

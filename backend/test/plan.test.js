@@ -155,7 +155,7 @@ function scenario({ start: s, days: n = 1, weather = {}, alerts = () => [], rip 
     }),
     getAlerts: async () => ({
       days: ds.map((date) => ({
-        date, rip, missing: [...(rip ? [] : ['rip_current']), ...nwsMissing],
+        date, rip, missing: [...nwsMissing, ...(nwsMissing.includes('nws_alerts') && !rip ? ['rip_current'] : [])],
         spots: Object.fromEntries(spots.map((sp) => [sp.id, alerts(date, sp.type)])),
       })),
       source: 'NWS', updatedAt: sent,
@@ -164,12 +164,13 @@ function scenario({ start: s, days: n = 1, weather = {}, alerts = () => [], rip 
 }
 const reason = (signal, verdict, event, text = event) => ({ signal, level: verdict === 'no' ? 'high' : 'moderate', verdict, event, text, source: 'NWS', updatedAt: sent })
 
-test('realistic quiet fall day (live NWS has no rip forecast): caution, windows in daylight, contract ok', async () => {
+test('realistic quiet fall day (no rip statement, HGX has no SRF): go, windows in daylight, contract ok', async () => {
   const plan = await buildPlan({ start: '2026-10-25', days: 1 }, scenario({ start: '2026-10-25' }))
   checkPlan(plan, { snapshot: false })
   const [day] = plan.days
-  assert.equal(day.safety.verdict, 'caution', 'unknown rip risk is never "go"')
-  assert.ok(day.safety.reasons.some((r) => r.signal === 'rip_current' && r.level === 'unknown'))
+  assert.equal(day.safety.verdict, 'go', 'no rip statement is not missing data')
+  assert.ok(day.safety.reasons.some((r) => r.signal === 'rip_current' && r.level === 'info'))
+  assert.ok(!day.missing.includes('rip_current'))
   assert.ok(day.windows.length >= 1, 'a normal day has somewhere to fish')
   const { sunrise, sunset } = sunTimes('2026-10-25')
   for (const w of day.windows) {
@@ -219,6 +220,7 @@ test('trip 3+ days out: NWS has nothing yet, so caution with an explanation', as
   checkPlan(plan)
   assert.equal(plan.days[0].safety.verdict, 'caution')
   assert.ok(plan.days[0].safety.reasons.some((r) => r.signal === 'nws_alerts' && r.level === 'unknown'))
+  assert.ok(plan.days[0].safety.reasons.some((r) => r.signal === 'rip_current' && r.level === 'unknown'))
 })
 
 test('DST start (Mar 14, 2027): 23 tide points, windows in CDT, contract ok', async () => {
