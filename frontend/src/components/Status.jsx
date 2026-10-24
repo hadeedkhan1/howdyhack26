@@ -20,3 +20,11 @@ export function ErrorState({ error, onRetry }) {
   )
 }
 
+export function DemoBadge({ show }) {
+  if (!show) return null
+  return (
+    <span className="inline-block rounded-full bg-amber/30 px-3 py-1 text-xs font-semibold">
+      Demo data
+    </span>
+  )
+}
