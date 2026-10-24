@@ -1,13 +1,18 @@
 // Loading and error states, used by every page that loads the plan.
 export function Loading() {
-  return <div className="h-40 animate-pulse rounded-card bg-navy/10" aria-label="Loading" />
+  return <div className="loading-card" role="status" aria-label="Loading your fishing plan">
+    <span className="skeleton-line wide" /><span className="skeleton-line" /><span className="skeleton-block" />
+    <span className="loading-caption">Checking the coast…</span>
+  </div>
 }
 
-export function ErrorState({ error }) {
+export function ErrorState({ error, onRetry }) {
   return (
-    <div className="rounded-card bg-coral/15 p-4">
-      <p className="font-semibold">Couldn't load the forecast.</p>
-      <p className="text-sm">{error?.message}</p>
+    <div className="error-card" role="alert">
+      <span className="error-icon" aria-hidden="true">!</span>
+      <p className="card-title">Couldn't load the forecast</p>
+      <p className="muted">{error?.message || 'The tide data did not come through. Try again in a moment.'}</p>
+      {onRetry && <button className="button button-dark button-small" onClick={onRetry}>Try again</button>}
     </div>
   )
 }
@@ -15,8 +20,6 @@ export function ErrorState({ error }) {
 export function DemoBadge({ show }) {
   if (!show) return null
   return (
-    <span className="inline-block rounded-full bg-amber/30 px-3 py-1 text-xs font-semibold">
-      Demo data
-    </span>
+    <span className="demo-badge"><span /> Demo forecast</span>
   )
 }
