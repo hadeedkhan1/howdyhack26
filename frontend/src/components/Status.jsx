@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 // Loading and error states, used by every page that loads the plan.
 export function Loading() {
   return <div className="loading-card" role="status" aria-label="Loading your fishing plan">
@@ -11,7 +13,8 @@ export function ErrorState({ error, onRetry }) {
     <div className="error-card" role="alert">
       <span className="error-icon" aria-hidden="true">!</span>
       <p className="card-title">Couldn't load the forecast</p>
-      <p className="muted">{error?.message || 'The tide data did not come through. Try again in a moment.'}</p>
+      <p className="muted">{error?.status === 400 ? 'That date doesn’t look valid. Go back and choose another date.' : error?.message || 'The tide data did not come through. Try again in a moment.'}</p>
+      {error?.status === 400 && <Link className="button button-outline button-small" to="/start">Choose another date</Link>}
       {onRetry && <button className="button button-dark button-small" onClick={onRetry}>Try again</button>}
     </div>
   )

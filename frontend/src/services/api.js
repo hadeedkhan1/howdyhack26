@@ -13,6 +13,11 @@ export async function getPlan({ start, days = 2, snapshot = false } = {}) {
   if (snapshot) params.set('snapshot', 'demo')
 
   const res = await fetch(`/api/plan?${params}`)
-  if (!res.ok) throw new Error(`Plan request failed (${res.status})`)
-  return res.json()
+  const data = await res.json()
+  if (!res.ok) {
+    const error = new Error(data.error || `Plan request failed (${res.status})`)
+    error.status = res.status
+    throw error
+  }
+  return data
 }
