@@ -33,3 +33,10 @@ Never change the API contract shape without updating AGENTS.md and telling the t
   `waterTemp`, `salinity`, `missing`; never throws. Water temp is the latest NOAA reading,
   not a forecast (>6h old -> "water_temperature" in missing); salinity isn't offered at
   8771450, so it is always null and in `missing`. routes/plan.js must copy `missing` into each day.
+- weather.js (done): `getWeather({ start, days, spots? })` returns per-day `spots[spotId]` hourly
+  [{t UTC, tempF, feelsLikeF, windMph, windFromDeg, pressureHpa, waveFt}] plus per-day `missing`
+  ("weather"/"waves", or "waves:<spotId>" if only some spots lack it); never throws. Spots with
+  null lat/lon use the Pier 21 coordinate (logged). Open-Meteo applies one fixed offset to the
+  whole response (wrong after DST ends), so we fetch unixtime and bucket by Chicago day.
+  Range: forecast 16 days, marine waves only ~10 days. Pressure is hPa (no inHg option).
+  Try it: `node scripts/try-weather.js [date] [days] [spotId]`.
