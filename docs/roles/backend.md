@@ -45,3 +45,5 @@ Never change the API contract shape without updating AGENTS.md and telling the t
   (24h TTL) no longer survive a long NOAA outage, so record snapshots/demo.json while APIs are up.
 - nws.js (done): `getAlerts({ start, days, spots? })` -> per-day `spots[spotId]` reasons (each with `verdict` "no"|"caution"), `rip`, `missing`; never throws.
   HGX has no Surf Zone Forecast: rip risk comes only from Rip Current / Beach Hazards statements, else "rip_current" is in `missing`, and days >48h out get "nws_alerts". Try: `node scripts/try-nws.js`.
+- scoring.js (done): pure. `scoreSpotDay({ spot, date, tide, waterTempF, weatherHours })` -> hourly `{ t, score, why, daylight }`; `planWindows(spots, bySpot)` -> contract `windows`
+  (max 3, non-overlapping, daylight only, score/why = peak hour). Missing inputs score 0, so routes/plan.js must list them in `missing`; water temp uses a generic 60–82°F rule until species.json ranges are filled.
