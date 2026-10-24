@@ -43,3 +43,5 @@ Never change the API contract shape without updating AGENTS.md and telling the t
 - cache.js (stale cap): `cachedJson` returns the same data as before, but a failed fetch serves cache only if
   under 6h old (`MAX_STALE_MS`), else rethrows so the service reports the item in `missing`. Tide predictions
   (24h TTL) no longer survive a long NOAA outage, so record snapshots/demo.json while APIs are up.
+- nws.js (done): `getAlerts({ start, days, spots? })` -> per-day `spots[spotId]` reasons (each with `verdict` "no"|"caution"), `rip`, `missing`; never throws.
+  HGX has no Surf Zone Forecast: rip risk comes only from Rip Current / Beach Hazards statements, else "rip_current" is in `missing`, and days >48h out get "nws_alerts". Try: `node scripts/try-nws.js`.
