@@ -40,3 +40,6 @@ Never change the API contract shape without updating AGENTS.md and telling the t
   whole response (wrong after DST ends), so we fetch unixtime and bucket by Chicago day.
   Range: forecast 16 days, marine waves only ~10 days. Pressure is hPa (no inHg option).
   Try it: `node scripts/try-weather.js [date] [days] [spotId]`.
+- cache.js (stale cap): `cachedJson` returns the same data as before, but a failed fetch serves cache only if
+  under 6h old (`MAX_STALE_MS`), else rethrows so the service reports the item in `missing`. Tide predictions
+  (24h TTL) no longer survive a long NOAA outage, so record snapshots/demo.json while APIs are up.
