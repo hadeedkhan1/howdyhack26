@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Loading } from './components/Status'
+import AmbientMap from './components/AmbientMap'
 
 const Start = lazy(() => import('./pages/Start'))
 const Check = lazy(() => import('./pages/Check'))
@@ -11,7 +12,8 @@ const Deck = lazy(() => import('./pages/Deck'))
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="mx-auto min-h-screen max-w-md">
+      <div className="app-experience mx-auto min-h-screen max-w-md">
+        <AmbientMap />
         <Suspense fallback={<main className="route-loading"><Loading /></main>}>
           <Routes>
             <Route path="/" element={<Navigate to="/start" replace />} />
