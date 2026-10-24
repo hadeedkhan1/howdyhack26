@@ -21,6 +21,9 @@ export function usePlan() {
 
   const loading = result.forDate !== date
   const plan = loading ? null : result.plan
-  const day = plan?.days.find((d) => d.date === date) ?? plan?.days[0] ?? null
-  return { plan, day, loading, error: loading ? null : result.error, date, retry: () => setRequestId((id) => id + 1) }
+  const day = plan?.days.find((d) => d.date === date) ?? (!date ? plan?.days[0] : null)
+  const error = !loading && !result.error && !day
+    ? new Error('The forecast did not include a day for that date. Choose another date and try again.')
+    : result.error
+  return { plan, day, loading, error: loading ? null : error, date, retry: () => setRequestId((id) => id + 1) }
 }

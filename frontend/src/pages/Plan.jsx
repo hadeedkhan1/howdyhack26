@@ -34,12 +34,12 @@ export default function Plan() {
           <div className="fishing-rating" aria-label={`Estimated fishing outlook ${outlookScore} out of 100, about ${outlookStars} stars. This is a forecast, not a visitor rating.`}>
             <span className="rating-stars" aria-hidden="true">{Array.from({ length: 5 }, (_, index) => <span key={index} className={index < outlookStars ? 'filled' : ''}>★</span>)}</span>
             <span className="rating-value">{(outlookScore / 20).toFixed(1)}<small>/5</small></span>
-            <span className="rating-copy"><b>Fishing outlook</b><small>Forecast estimate · not visitor reviews</small></span>
+            <span className="rating-copy"><b>Fishing outlook</b></span>
             <span className="rating-score">{outlookScore}<small>/100</small></span>
           </div>
-          <section className="plan-hero"><div className="plan-hero-top"><span className="weather-sun">☼</span><span>YOUR FIRST TRIP, SORTED</span><span className="hero-squiggle">〰</span></div>
+          <section className="plan-hero">
             <h2>Go where the water<br /><em>is moving.</em></h2><p>We found {day.windows.length} promising time{day.windows.length === 1 ? '' : 's'} around Galveston. Pick one and we’ll explain why.</p>
-            <div className="plan-hero-stats"><span><b>{day.windows.length.toString().padStart(2, '0')}</b><small>good windows</small></span><span><b>{day.likelySpecies.length.toString().padStart(2, '0')}</b><small>species to meet</small></span><span><b>0</b><small>boats needed</small></span></div>
+            <div className="plan-hero-stats"><span><b>{day.windows.length.toString().padStart(2, '0')}</b><small>good windows</small></span><span><b>{day.likelySpecies.length.toString().padStart(2, '0')}</b><small>species to meet</small></span></div>
           </section>
           <Suspense fallback={<div className="map-loading"><span className="skeleton-block" /><b>Loading the shoreline map…</b></div>}>
             <SpotMap windows={sortedWindows} selectedSpot={activeSpot} onSelect={(id) => { setSelectedSpot(id); const next = sortedWindows.find((window) => window.spotId === id); if (next) setSelectedKey(`${next.spotId}-${next.start}`) }} />
@@ -50,7 +50,7 @@ export default function Plan() {
               const selected = selectedWindow === window
               return <li key={`${window.spotId}-${window.start}`}><button type="button" className={`window-card ${selected ? 'selected' : ''}`} onClick={() => { setSelectedKey(`${window.spotId}-${window.start}`); setSelectedSpot(window.spotId) }} aria-pressed={selected}>
                 <span className="window-rank">{index === 0 ? 'BEST' : `0${index + 1}`}</span><span className="window-time"><b>{window.start}<i>—</i>{window.end}</b><small>{spotsById[window.spotId]?.name?.replace('Galveston Island State Park — ', 'State Park · ') || window.spotId}</small></span>
-                <span className="window-score"><b>{window.score}</b><small>estimated</small></span><span className="window-trend" aria-hidden="true">↗</span>
+                <span className="window-score"><b>{window.score}</b></span><span className="window-trend" aria-hidden="true">↗</span>
               </button></li>
             })}</ol>
           </section>
@@ -58,7 +58,6 @@ export default function Plan() {
             <TideChart tide={day.tide} windows={day.windows} />
           </Suspense>
           <WhyPanel window={selectedWindow} />
-          <p className="plan-footnote">Fishing scores are estimates, not guarantees. Check conditions again before leaving.</p>
         </div>
       )}
     </Screen>

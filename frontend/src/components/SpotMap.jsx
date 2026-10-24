@@ -67,7 +67,6 @@ export default function SpotMap({ windows = [], selectedSpot, onSelect }) {
         <button type="button" className={layer === 'satellite' ? 'active' : ''} onClick={() => setLayer('satellite')} aria-pressed={layer === 'satellite'}>Satellite</button>
         <button type="button" className={layer === 'street' ? 'active' : ''} onClick={() => setLayer('street')} aria-pressed={layer === 'street'}>Map</button>
       </div>
-      <div className="map-overlay-caption"><span className="map-live-dot" /> GALVESTON ISLAND <span>·</span> SHORE + PIER</div>
     </div>
     <p className="map-location-note">Park marker shows TPWD headquarters; fishing areas are on both the beach and bay sides. <a href="https://tpwd.texas.gov/state-parks/galveston-island/map" target="_blank" rel="noreferrer">View official park map ↗</a></p>
     <div className="spot-list">
@@ -75,7 +74,7 @@ export default function SpotMap({ windows = [], selectedSpot, onSelect }) {
         const topWindow = windows.find((window) => window.spotId === spot.id)
         return <button type="button" key={spot.id} onClick={() => onSelect?.(spot.id)} className={`spot-option ${active?.id === spot.id ? 'selected' : ''}`} aria-pressed={active?.id === spot.id}>
           <span className="spot-number">0{index + 1}</span><span className="spot-option-copy"><b>{spotShortNames[spot.id]}</b><small>{spot.type === 'surf' ? 'Open Gulf · shore fishing' : spot.type === 'bay' ? 'Sheltered water · shore fishing' : 'Pier · easy access'}</small></span>
-          {topWindow ? <span className="spot-window">{topWindow.start}<small>best window</small></span> : <span className="spot-arrow">↗</span>}
+          {topWindow ? <span className="spot-window">{topWindow.start}</span> : <span className="spot-arrow">↗</span>}
         </button>
       })}
     </div>
