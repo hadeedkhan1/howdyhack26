@@ -1,7 +1,8 @@
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import Screen from '../components/Screen'
 import SafetyBadge from '../components/SafetyBadge'
 import LicenseQuiz from '../components/LicenseQuiz'
+import PlanSlider from '../components/PlanSlider'
 import { ErrorState, Loading } from '../components/Status'
 import { usePlan } from '../services/usePlan'
 import { useState } from 'react'
@@ -18,6 +19,7 @@ function timeAgo(value) {
 export default function Check() {
   const { day, loading, error, retry } = usePlan()
   const { search } = useLocation()
+  const navigate = useNavigate()
   const [showReasons, setShowReasons] = useState(false)
 
   return (
@@ -25,7 +27,7 @@ export default function Check() {
       {loading && <Loading />}
       {error && <ErrorState error={error} onRetry={retry} />}
       {day && (
-        <div className="grid gap-4">
+        <div className="check-flow">
           <SafetyBadge verdict={day.safety.verdict} reason={day.safety.reasons[0]?.text} />
           <section className="panel conditions-panel">
             <button className="conditions-toggle" onClick={() => setShowReasons(!showReasons)} aria-expanded={showReasons}>
@@ -36,9 +38,7 @@ export default function Check() {
             </li>)}</ul>}
           </section>
           <LicenseQuiz />
-          <Link to={`/plan${search}`} className="button button-dark continue-button">
-            Build my fishing plan <span>→</span>
-          </Link>
+          <PlanSlider onComplete={() => navigate(`/plan${search}`)} />
         </div>
       )}
     </Screen>
