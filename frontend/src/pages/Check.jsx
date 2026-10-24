@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import Screen from '../components/Screen'
 import SafetyBadge from '../components/SafetyBadge'
 import LicenseQuiz from '../components/LicenseQuiz'
-import { DemoBadge, ErrorState, Loading } from '../components/Status'
+import { ErrorState, Loading } from '../components/Status'
 import { usePlan } from '../services/usePlan'
 import { useState } from 'react'
 
@@ -16,17 +16,16 @@ function timeAgo(value) {
 
 // Owner: Frontend lead. "Can I fish today?" = safety verdict + license check.
 export default function Check() {
-  const { plan, day, loading, error, retry } = usePlan()
+  const { day, loading, error, retry } = usePlan()
   const { search } = useLocation()
   const [showReasons, setShowReasons] = useState(false)
 
   return (
-    <Screen title="Can I fish today?" eyebrow="FIRST, A QUICK COAST CHECK">
+    <Screen title="Can I fish today?">
       {loading && <Loading />}
       {error && <ErrorState error={error} onRetry={retry} />}
       {day && (
         <div className="grid gap-4">
-          <DemoBadge show={plan.snapshot} />
           <SafetyBadge verdict={day.safety.verdict} reason={day.safety.reasons[0]?.text} />
           <section className="panel conditions-panel">
             <button className="conditions-toggle" onClick={() => setShowReasons(!showReasons)} aria-expanded={showReasons}>

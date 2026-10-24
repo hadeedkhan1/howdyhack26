@@ -16,23 +16,21 @@ function FishMark() {
 
 // The playing card used on Hand, Deck and the draw.
 // mode: "face" (full card), "silhouette" (not collected yet), "back" (card back for flips).
-export default function SpeciesCard({ species, mode = 'face', compact = false, likelihood, onClick }) {
+export default function SpeciesCard({ species, mode = 'face', compact = false, likelihood, catchPhoto, onClick }) {
   const [expanded, setExpanded] = useState(false)
   if (!species) return null
   const rank = ranks[Math.max(0, Object.keys(regulations.species).indexOf(species.id))] || '★'
   const suit = suits[Math.max(0, Object.keys(regulations.species).indexOf(species.id)) % suits.length]
 
   if (mode === 'back') {
-    return <div className="species-card card-back" aria-label="Card back"><div className="back-inner"><span>GO<br />FISH</span><i>✳</i></div></div>
+    return <div className="species-card card-back" aria-label="Go Fish card back"><img src="/go-fish-card-back.png" alt="Go Fish" /></div>
   }
   if (mode === 'silhouette') {
     return (
       <button type="button" className={`species-card silhouette-card ${compact ? 'compact' : ''}`} onClick={onClick} aria-label={`Uncollected card: ${species.name}. ${label(species.howTo, 'Tap to learn how to catch it.')}`}>
         <span className="card-rank">? <small>♣</small></span>
         <div className="silhouette-art"><FishMark /></div>
-        <div className="silhouette-copy"><span className="card-kicker">UNCAUGHT · {species.spotTypes?.length ? species.spotTypes.join(' / ') : 'GALVESTON'}</span>
-          <h3>Unknown catch</h3></div>
-        <span className="card-collect-hint">Tap to reveal the clue ↗</span>
+        <div className="silhouette-copy"><h3>Tap to reveal</h3></div>
       </button>
     )
   }
@@ -41,14 +39,12 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
     <article className={`species-card face-card ${compact ? 'compact' : ''} ${expanded ? 'expanded' : ''}`}>
       <button type="button" className="card-main" onClick={() => { setExpanded(!expanded); onClick?.() }} aria-expanded={expanded}>
         <span className="card-rank">{rank}<small>{suit}</small></span>
-        <div className="card-art"><span className="art-label">GULF COAST · FIELD NOTES</span>{species.photo ? <img src={species.photo} alt={species.name} /> : <FishMark />}
-          <span className="art-caption">YOUR NEXT<br />GOOD STORY</span></div>
+        <div className={`card-art ${catchPhoto ? 'catch-photo-art' : ''}`}>{catchPhoto || species.photo ? <img src={catchPhoto || species.photo} alt={catchPhoto ? `Catch photo of ${species.name}` : species.name} /> : <FishMark />}</div>
         <div className="card-information"><div className="card-title-row"><h3>{species.name}</h3>{likelihood && <span className={`likelihood likelihood-${likelihood}`}>{likelihood}</span>}</div>
           <p className="card-bait"><span className="mini-icon">⌁</span> {species.bait?.length ? species.bait.join(' · ') : 'Bait details soon'}</p>
           {!compact && <><div className="card-rule" /><p className="card-detail"><b>Rig</b><span>{label(species.rig)}</span></p><p className="card-detail"><b>Keep / release</b><span>{label(regulations.species[species.id]?.notes, 'Check current TPWD rules')}</span></p><p className="card-detail"><b>Good to know</b><span>{label(species.handling)}</span></p>
             <p className="eat-note"><span>{species.eat?.ok === true ? '✓' : species.eat?.ok === false ? '!' : '↗'}</span> {species.eat?.ok == null ? 'Check local advisories before eating' : species.eat.note}</p></>}
         </div>
-        <span className="card-expand-hint">{compact ? 'Tap for field notes' : 'Tap to ' + (expanded ? 'fold' : 'learn more')} <span aria-hidden="true">{expanded ? '↑' : '↓'}</span></span>
       </button>
       {compact && expanded && <div className="compact-details"><p><b>How to rig:</b> {label(species.rig)}</p><p><b>Handling:</b> {label(species.handling)}</p><p><b>Limits:</b> {label(regulations.species[species.id]?.notes, 'Check TPWD before keeping')}</p></div>}
     </article>

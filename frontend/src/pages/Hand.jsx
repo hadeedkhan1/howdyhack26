@@ -29,11 +29,10 @@ export default function Hand() {
             <button className="flip-control" onClick={() => setRevealedDraw(revealed ? null : draw.id)}>{revealed ? 'Flip it back' : 'Reveal your draw'} <span>↻</span></button>
           </div>}
           <section className="also-biting"><div className="section-heading"><div><h2>Also in the cards</h2></div><span className="round-icon">♧</span></div>
-            <div className="likely-list">{day.likelySpecies.filter((entry) => entry.id !== day.draw && speciesById[entry.id]).slice(0, 3).map((entry, index) => <div className="likely-item" key={entry.id}>
-              <span className="likely-index">0{index + 1}</span><SpeciesCard species={speciesById[entry.id]} compact likelihood={entry.likelihood} />
+            <div className="likely-list">{day.likelySpecies.filter((entry) => entry.id !== day.draw && speciesById[entry.id]).slice(0, 3).map((entry) => <div className="likely-item" key={entry.id}>
+              <SpeciesCard species={speciesById[entry.id]} compact likelihood={entry.likelihood} />
             </div>)}</div>
           </section>
-          <p className="plan-footnote">These are possibilities based on conditions—not a guarantee of what you'll catch.</p>
         </div>
       )}
     </Screen>
