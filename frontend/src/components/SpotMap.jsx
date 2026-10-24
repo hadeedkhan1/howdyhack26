@@ -49,7 +49,7 @@ export default function SpotMap({ windows = [], selectedSpot, onSelect }) {
   const destinationCoords = `${activeLocation.lat},${activeLocation.lon}`
 
   return <section className="panel spot-panel" aria-label="Choose a fishing spot">
-    <div className="section-heading"><div><p className="eyebrow">FIND YOUR SHORELINE</p><h2>Galveston, from above</h2></div><span className="round-icon">⌖</span></div>
+    <div className="section-heading"><div><h2>Galveston, from above</h2></div><span className="round-icon">⌖</span></div>
     <div className="satellite-map">
       <MapContainer center={[29.225, -94.906]} zoom={11} scrollWheelZoom={false} zoomControl={false} aria-label="Satellite map of Galveston fishing locations">
         <TileLayer url={layer === 'satellite' ? satelliteUrl : streetUrl} attribution={layer === 'satellite' ? 'Tiles &copy; Esri, Maxar, Earthstar Geographics' : '&copy; OpenStreetMap contributors'} />

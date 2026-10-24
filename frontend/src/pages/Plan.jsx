@@ -1,7 +1,7 @@
 import Screen from '../components/Screen'
 import { lazy, Suspense, useMemo, useState } from 'react'
 import WhyPanel from '../components/WhyPanel'
-import { DemoBadge, ErrorState, Loading } from '../components/Status'
+import { ErrorState, Loading } from '../components/Status'
 import { usePlan } from '../services/usePlan'
 import { spotsById } from '../services/content'
 
@@ -14,7 +14,7 @@ function formatDate(value) {
 
 // Owner: Frontend lead. Map + ranked windows + tide chart + "why".
 export default function Plan() {
-  const { plan, day, loading, error, retry } = usePlan()
+  const { day, loading, error, retry } = usePlan()
   const [selectedSpot, setSelectedSpot] = useState(null)
   const sortedWindows = useMemo(() => [...(day?.windows || [])].sort((a, b) => b.score - a.score), [day])
   const [selectedKey, setSelectedKey] = useState(null)
@@ -26,12 +26,11 @@ export default function Plan() {
   const outlookStars = Math.max(0, Math.min(5, Math.round(outlookScore / 20)))
 
   return (
-    <Screen title="Galveston, TX" eyebrow={`YOUR FISHING DAY · ${day ? formatDate(day.date).toUpperCase() : 'LOCAL OUTLOOK'}`} nav>
+    <Screen title="Galveston, TX" eyebrow={`${day ? formatDate(day.date).toUpperCase() : 'LOCAL OUTLOOK'}`} nav>
       {loading && <Loading />}
       {error && <ErrorState error={error} onRetry={retry} />}
       {day && (
         <div className="plan-content">
-          <div className="plan-date-row"><span>{formatDate(day.date)}</span><DemoBadge show={plan.snapshot} /></div>
           <div className="fishing-rating" aria-label={`Estimated fishing outlook ${outlookScore} out of 100, about ${outlookStars} stars. This is a forecast, not a visitor rating.`}>
             <span className="rating-stars" aria-hidden="true">{Array.from({ length: 5 }, (_, index) => <span key={index} className={index < outlookStars ? 'filled' : ''}>★</span>)}</span>
             <span className="rating-value">{(outlookScore / 20).toFixed(1)}<small>/5</small></span>
@@ -45,7 +44,7 @@ export default function Plan() {
           <Suspense fallback={<div className="map-loading"><span className="skeleton-block" /><b>Loading the shoreline map…</b></div>}>
             <SpotMap windows={sortedWindows} selectedSpot={activeSpot} onSelect={(id) => { setSelectedSpot(id); const next = sortedWindows.find((window) => window.spotId === id); if (next) setSelectedKey(`${next.spotId}-${next.start}`) }} />
           </Suspense>
-          <section className="windows-section"><div className="section-heading"><div><p className="eyebrow">TIMING IS EVERYTHING</p><h2>Best times to cast</h2></div><span className="estimate-pill">ESTIMATES</span></div>
+          <section className="windows-section"><div className="section-heading"><div><h2>Best times to cast</h2></div><span className="estimate-pill">ESTIMATES</span></div>
             <p className="muted windows-intro">Ranked by changing tide, wind, and light. Tap a time to see the reasoning.</p>
             <ol className="window-list">{sortedWindows.map((window, index) => {
               const selected = selectedWindow === window

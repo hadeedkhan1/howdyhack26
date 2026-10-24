@@ -39,14 +39,14 @@ export default function Deck() {
   const clue = species.find((item) => item.id === clueId)
 
   return (
-    <Screen title="Your fishing stories, collected." eyebrow="THE DECK · YOUR CATCHES, YOUR WAY" nav>
+    <Screen title="Your fishing stories, collected." nav>
       <div className="deck-content">
         <section className="deck-summary"><div className="deck-summary-top"><span className="deck-stamp">✳</span><span>YOUR LITTLE BIT OF THE GULF</span></div>
           <div className="deck-progress-row"><div><b>{new Set(catches.map((entry) => entry.speciesId)).size}</b><span> / {species.length} species</span></div><span>{catches.length} {catches.length === 1 ? 'catch' : 'catches'} logged</span></div>
           <div className="deck-meter"><span style={{ width: `${Math.min(100, new Set(catches.map((entry) => entry.speciesId)).size / species.length * 100)}%` }} /></div>
           <p>Every fish has a story. Keep them here—catch and release counts, too.</p>
         </section>
-        <div className="deck-tools"><div><p className="eyebrow">THE SEVEN-CARD SET</p><h2>Your collection</h2></div><button className="button button-dark log-catch-button" onClick={() => setLogging(true)}>＋ Log a catch</button></div>
+        <div className="deck-tools"><div><h2>Your collection</h2></div><button className="button button-dark log-catch-button" onClick={() => setLogging(true)}>＋ Log a catch</button></div>
         {catches.length >= 4 && Object.entries(counts).filter(([, count]) => count >= 4).map(([id]) => <div className="four-kind-banner" key={id}><span>♧</span><p><b>Four of a kind!</b> You've logged four {species.find((item) => item.id === id)?.name}.</p><span>✦</span></div>)}
         {!loaded ? <div className="loading-card" role="status"><span className="skeleton-line wide" /><span className="skeleton-block" /></div> : <div className="deck-grid">{species.map((item) => {
           const count = counts[item.id] || 0

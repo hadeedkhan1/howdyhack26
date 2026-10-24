@@ -15,7 +15,6 @@ export default function Screen({ title, eyebrow, children, nav = false }) {
           <span className="brand-mark" aria-hidden="true">✳</span>
           <span>go fish<span className="brand-period">.</span></span>
         </Link>
-        <span className="topbar-location"><span className="location-dot" /> GALVESTON, TX</span>
       </header>
       {step >= 0 && <div className="flow-progress" aria-label={`Step ${step + 1} of 5`}><span style={{ width: `${((step + 1) / 5) * 100}%` }} /></div>}
       <div className="screen-content">
@@ -26,7 +25,6 @@ export default function Screen({ title, eyebrow, children, nav = false }) {
         {children}
       </div>
       {nav && <BottomNav />}
-      <footer className="shell-footer">Made for first casts, not experts <span>✳</span></footer>
     </main>
   )
 }

@@ -17,9 +17,3 @@ export function ErrorState({ error, onRetry }) {
   )
 }
 
-export function DemoBadge({ show }) {
-  if (!show) return null
-  return (
-    <span className="demo-badge"><span /> Demo forecast</span>
-  )
-}
