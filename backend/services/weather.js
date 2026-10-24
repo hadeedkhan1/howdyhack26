@@ -2,7 +2,8 @@
 // Requests use timezone=America/Chicago, but Open-Meteo applies ONE fixed offset to the whole
 // response (CDT -5h even after DST ends Nov 1), so we ask for unixtime and bucket hours into
 // Chicago days ourselves with services/time.js.
-import { cachedJson } from './cache.js'
+import { statSync } from 'node:fs'
+import { cachedJson, cacheFile } from './cache.js'
 import { spots as allSpots } from './data.js'
 import { TZ, addDays, chicagoMidnight } from './time.js'
 
@@ -28,14 +29,18 @@ function url(base, lat, lon, params) {
   return `${base}?${q}`
 }
 
+// When the cached copy of `u` was fetched (it may be stale cache served after a failed fetch).
+const fetchedAt = (u) => statSync(cacheFile(u)).mtime
+
 // Same URL for every date, so one cached response per spot serves all trip dates.
 async function forecast(lat, lon) {
-  const data = await cachedJson(url(FORECAST, lat, lon, {
+  const u = url(FORECAST, lat, lon, {
     hourly: 'temperature_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,pressure_msl',
     temperature_unit: 'fahrenheit', wind_speed_unit: 'mph',
-  }), { ttlMs: TTL_MS, validate: openMeteoOk })
+  })
+  const data = await cachedJson(u, { ttlMs: TTL_MS, validate: openMeteoOk })
   const h = data.hourly
-  return h.time.map((s, i) => ({
+  const hours = h.time.map((s, i) => ({
     t: new Date(s * 1000).toISOString(),
     tempF: h.temperature_2m[i],
     feelsLikeF: h.apparent_temperature[i],
@@ -43,12 +48,14 @@ async function forecast(lat, lon) {
     windFromDeg: h.wind_direction_10m[i], // meteorological: direction the wind blows FROM
     pressureHpa: h.pressure_msl[i],
   }))
+  return { hours, fetchedAt: fetchedAt(u) }
 }
 
 async function marine(lat, lon) {
-  const data = await cachedJson(url(MARINE, lat, lon, { hourly: 'wave_height', length_unit: 'imperial' }),
-    { ttlMs: TTL_MS, validate: openMeteoOk })
-  return new Map(data.hourly.time.map((s, i) => [new Date(s * 1000).toISOString(), data.hourly.wave_height[i]]))
+  const u = url(MARINE, lat, lon, { hourly: 'wave_height', length_unit: 'imperial' })
+  const data = await cachedJson(u, { ttlMs: TTL_MS, validate: openMeteoOk })
+  const waves = new Map(data.hourly.time.map((s, i) => [new Date(s * 1000).toISOString(), data.hourly.wave_height[i]]))
+  return { waves, fetchedAt: fetchedAt(u) }
 }
 
 function coords(spot) {
@@ -61,6 +68,7 @@ function coords(spot) {
 // { days: [{ date, spots: { <spotId>: [{ t (UTC ISO), tempF, feelsLikeF, windMph, windFromDeg,
 //            pressureHpa, waveFt }] }, missing: [string] }],
 //   spots: { <spotId>: { lat, lon, fallback } }, source, updatedAt }
+// updatedAt is when the oldest data used was fetched (stale cache counts as its real age).
 // A day's `missing` holds "weather"/"waves" when no spot has that data for the date (e.g.
 // beyond the forecast range), or "weather:<spotId>"/"waves:<spotId>" when only some spots lack it.
 // Never throws.
@@ -73,10 +81,13 @@ export async function getWeather({ start, days = 1, spots = allSpots }) {
     if (wv.status === 'rejected') console.warn(`[weather] marine failed for ${spot.id}: ${wv.reason.message}`)
     return {
       id: spot.id, coords: c,
-      hours: fc.status === 'fulfilled' ? fc.value : [],
-      waves: wv.status === 'fulfilled' ? wv.value : new Map(),
+      hours: fc.status === 'fulfilled' ? fc.value.hours : [],
+      waves: wv.status === 'fulfilled' ? wv.value.waves : new Map(),
+      fetchedAt: [fc, wv].filter((r) => r.status === 'fulfilled').map((r) => r.value.fetchedAt),
     }
   }))
+  // Oldest data actually used (stale cache can be up to 6h old); now if nothing was fetched.
+  const oldest = perSpot.flatMap((s) => s.fetchedAt).reduce((a, b) => (b < a ? b : a), new Date())
 
   const result = {
     days: dates.map((date) => {
@@ -98,7 +109,7 @@ export async function getWeather({ start, days = 1, spots = allSpots }) {
     }),
     spots: Object.fromEntries(perSpot.map((s) => [s.id, s.coords])),
     source: SOURCE,
-    updatedAt: new Date().toISOString(),
+    updatedAt: oldest.toISOString(),
   }
   return result
 }

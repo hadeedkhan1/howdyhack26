@@ -117,3 +117,91 @@ test('forecast thresholds: heat index >= 103, wind > 20 mph, high waves -> "caut
   // Exactly 20 mph is not "> 20".
   assert.equal(safetyVerdict({ alerts: nwsDay(), weather: weatherDay({ windMph: 20 }), updatedAt }).verdict, 'go')
 })
+
+// --- Edge cases and realistic days ----------------------------------------------------------
+
+const onlyAt = (types, alerts) => ({
+  date: '2026-10-24', rip: { level: 'low' }, missing: [],
+  spots: Object.fromEntries(spots.map((s) => [s.id, types.includes(s.type) ? alerts.flatMap((a) => mapAlert(a, s.type) ?? []) : []])),
+})
+
+test('two overlapping advisories of the same kind name only the spots they cover', () => {
+  // NWS often has two Small Craft Advisories out at once (now, and a later period), Gulf zone only.
+  const r = safetyVerdict({
+    alerts: onlyAt(['surf', 'pier'], [
+      { ...alert('Small Craft Advisory', 'SCA until 10 AM'), id: 'sca-1' },
+      { ...alert('Small Craft Advisory', 'SCA from 4 PM'), id: 'sca-2' },
+    ]),
+    weather: weatherDay(), updatedAt,
+  })
+  const sca = r.reasons.filter((x) => x.signal === 'small_craft_advisory')
+  assert.equal(sca.length, 1, 'one reason')
+  assert.match(sca[0].text, /^Beach side and Pier: /, 'does not claim the bay side too')
+})
+
+test('hurricane day: "no" first, even with heat and missing data piled on', () => {
+  const r = safetyVerdict({
+    alerts: nwsDay([alert('Hurricane Warning', 'Hurricane Warning in effect')], { rip: null, missing: ['rip_current'] }),
+    weather: weatherDay({ feelsLikeF: 108, windMph: 45, waveFt: 9 }), updatedAt,
+  })
+  assert.equal(r.verdict, 'no')
+  assert.equal(r.reasons[0].signal, 'tropical')
+  assert.match(r.reasons[0].text, /Do not go/)
+  const rank = { high: 2, moderate: 1, unknown: 1, low: 0, none: 0 }
+  const ranks = r.reasons.map((x) => rank[x.level])
+  assert.deepEqual(ranks, [...ranks].sort((a, b) => b - a), 'worst first')
+  assertContractShape(r)
+})
+
+test('summer afternoon: heat index 106 -> caution with plain-language advice', () => {
+  const r = safetyVerdict({ alerts: nwsDay(), weather: weatherDay({ feelsLikeF: 106 }), updatedAt })
+  assert.equal(r.verdict, 'caution')
+  assert.match(r.reasons[0].text, /106°F/)
+  assert.match(r.reasons[0].text, /water/)
+})
+
+test('numbers shown never contradict the verdict near a threshold', () => {
+  // 20.3 mph is over 20: the text must not say "20 mph".
+  const wind = safetyVerdict({ alerts: nwsDay(), weather: weatherDay({ windMph: 20.3 }), updatedAt })
+  assert.equal(wind.verdict, 'caution')
+  assert.doesNotMatch(wind.reasons[0].text, /\b20 mph/)
+  // 102.6°F would display as 103°F, which is the heat threshold: never "103°F. No heat danger."
+  const heat = safetyVerdict({ alerts: nwsDay(), weather: weatherDay({ feelsLikeF: 102.6 }), updatedAt })
+  const h = heat.reasons.find((x) => x.signal === 'heat')
+  assert.ok(!(/103°F/.test(h.text) && h.level === 'none'), h.text)
+  // 4.04 ft waves are over 4 ft: don't print "4 ft" next to a high-waves caution.
+  const waves = safetyVerdict({ alerts: nwsDay(), weather: weatherDay({ waveFt: 4.04 }), updatedAt })
+  const w = waves.reasons.find((x) => x.signal === 'waves')
+  assert.equal(w.level, 'moderate')
+  assert.doesNotMatch(w.text, /up to 4 ft/)
+})
+
+test('bay waves are ignored for safety (sheltered), Gulf waves are not', () => {
+  const day = weatherDay()
+  day.spots['gisp-bay'] = [{ ...day.spots['gisp-bay'][0], waveFt: 7 }]
+  assert.equal(safetyVerdict({ alerts: nwsDay(), weather: day, updatedAt }).verdict, 'go')
+  day.spots['galveston-pier'] = [{ ...day.spots['galveston-pier'][0], waveFt: 6 }]
+  const r = safetyVerdict({ alerts: nwsDay(), weather: day, updatedAt })
+  assert.equal(r.verdict, 'caution')
+  assert.match(r.reasons[0].text, /^Pier: /)
+})
+
+test('null/NaN forecast values do not leak into the text', () => {
+  const r = safetyVerdict({ alerts: nwsDay(), weather: weatherDay({ feelsLikeF: null, windMph: Number.NaN }), updatedAt })
+  for (const x of r.reasons) assert.doesNotMatch(x.text, /NaN|null|undefined|Infinity/)
+})
+
+test('weather missing for one spot names that spot; for every spot it does not', () => {
+  const one = safetyVerdict({ alerts: nwsDay(), weather: weatherDay({}, { missing: ['weather:gisp-beach'] }), updatedAt })
+  assert.match(one.reasons.find((x) => x.signal === 'weather').text, /^Beach side: /)
+  const all = safetyVerdict({ alerts: nwsDay(), weather: weatherDay({}, { missing: ['weather:gisp-beach', 'weather'] }), updatedAt })
+  const w = all.reasons.filter((x) => x.signal === 'weather')
+  assert.equal(w.length, 1)
+  assert.doesNotMatch(w[0].text, /^Beach side/)
+})
+
+test('"go" reasons never use the word safe (AGENTS.md: "Go: no hazards flagged")', () => {
+  const r = safetyVerdict({ alerts: nwsDay(), weather: weatherDay(), updatedAt })
+  assert.equal(r.verdict, 'go')
+  for (const x of r.reasons) assert.doesNotMatch(x.text, /\bsafe\b/i)
+})

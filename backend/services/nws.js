@@ -113,7 +113,7 @@ function coords(spot) {
 const summarize = (a) => ({
   id: a.id, event: a.event, severity: a.severity, headline: a.headline,
   onset: a.onset ?? a.effective, ends: a.ends ?? a.expires, sent: a.sent,
-  zones: a.affectedZones.map((z) => z.split('/').pop()),
+  zones: (a.affectedZones ?? []).map((z) => z.split('/').pop()),
 })
 
 // One alert -> one safety reason for a spot of the given type, or null if it doesn't apply.
@@ -122,8 +122,9 @@ const summarize = (a) => ({
 export function mapAlert(a, spotType) {
   if (a.status && a.status !== 'Actual') return null // NWS sends Test/Exercise messages too
   let [signal, verdict] = classify(a.event)
+  // Rip currents form on Gulf-facing beaches, not in the bay. HGX uses both statements for rip risk.
+  if (spotType === 'bay' && (a.event === 'Rip Current Statement' || a.event === 'Beach Hazards Statement')) return null
   if (a.event === 'Rip Current Statement') {
-    if (spotType === 'bay') return null // rip currents form on Gulf-facing beaches, not in the bay
     // High rip risk is a "no" at surf spots; on the Gulf pier you're above the surf, so caution.
     signal = 'rip_current'
     verdict = spotType === 'surf' ? 'no' : 'caution'
@@ -176,7 +177,7 @@ export async function getAlerts({ start, days = 1, spots = allSpots }) {
   // Alerts for each spot: its point, plus marine-zone alerts that list the spot's zone.
   const spotAlerts = Object.fromEntries(spots.map((s) => {
     const c = spotInfo[s.id]
-    const marine = byZone.filter((a) => a.affectedZones.some((z) => z.endsWith(`/${c.marineZone}`)))
+    const marine = byZone.filter((a) => (a.affectedZones ?? []).some((z) => z.endsWith(`/${c.marineZone}`)))
     const seen = new Set()
     return [s.id, [...byPoint[`${c.lat},${c.lon}`], ...marine].filter((a) => !seen.has(a.id) && seen.add(a.id))]
   }))

@@ -13,11 +13,17 @@ const router = Router()
 const readJson = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'))
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
+// A real calendar date: rejects 2026-02-30 (Date.parse rolls it to Mar 2) and years 0-99
+// (Date.UTC maps them to the 1900s), since addDays would round-trip them to a different date.
+const isRealDate = (s) => typeof s === 'string' && DATE_RE.test(s) && Number(s.slice(0, 4)) >= 1000 && addDays(s, 0) === s
 
 // The services never throw, but a bug in one must not take down the whole plan.
+// A result without a `days` list counts as a failure too.
 async function settle(name, promise) {
   try {
-    return await promise
+    const r = await promise
+    if (!Array.isArray(r?.days)) throw new Error('returned no days')
+    return r
   } catch (err) {
     console.error(`[plan] ${name} failed: ${err.message}`)
     return null
@@ -57,10 +63,10 @@ export async function buildPlan({ start, days = 1 }, fetchers = {}) {
     const alertDay = alerts?.days.find((d) => d.date === date)
 
     const missing = [
-      ...(tides ? tides.missing : ['tide', 'water_temperature']),
-      ...(tides && !tideDay?.tide.length && !tides.missing.includes('tide') ? ['tide'] : []),
-      ...(weatherDay ? weatherDay.missing : ['weather', 'waves']),
-      ...(alertDay ? alertDay.missing : ['nws_alerts', 'rip_current']),
+      ...(tides ? tides.missing ?? [] : ['tide', 'water_temperature']),
+      ...(tides && !tideDay?.tide?.length ? ['tide'] : []),
+      ...(weatherDay ? weatherDay.missing ?? [] : ['weather', 'waves']),
+      ...(alertDay ? alertDay.missing ?? [] : ['nws_alerts', 'rip_current']),
     ]
 
     const tide = tideDay?.tide ?? []
@@ -101,7 +107,7 @@ router.get('/', async (req, res) => {
   }
   const start = req.query.start ?? chicagoDate(new Date())
   const days = req.query.days === undefined ? 1 : Number(req.query.days)
-  if (!DATE_RE.test(start) || Number.isNaN(Date.parse(start))) {
+  if (!isRealDate(start)) {
     return res.status(400).json({ error: 'start must be YYYY-MM-DD' })
   }
   if (days !== 1 && days !== 2) {

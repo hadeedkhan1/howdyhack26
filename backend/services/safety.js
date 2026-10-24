@@ -16,6 +16,13 @@ export const WIND_MPH = 20 // AGENTS.md: wind > 20 mph => caution
 export const HIGH_WAVES_FT = 4
 
 const RANK = { go: 0, caution: 1, no: 2 }
+// Forecast numbers are rounded UP for display and the thresholds are checked on the shown number,
+// so the text never says "Wind up to 20 mph" next to a "> 20 mph" caution (or "103°F, no danger").
+const SHOWN = {
+  feelsLikeF: (v) => Math.ceil(v),
+  windMph: (v) => Math.ceil(v),
+  waveFt: (v) => Math.ceil(v * 10 - 1e-9) / 10,
+}
 
 // Short spot names for reason text.
 const PLACE = { surf: 'Beach side', bay: 'Bay side', pier: 'Pier' }
@@ -133,7 +140,8 @@ export function safetyVerdict({ alerts, weather, missing = [], updatedAt = {}, s
     for (const r of alerts?.spots?.[spot.id] ?? []) {
       const key = `${r.signal}|${r.verdict}|${r.event}`
       const m = merged.get(key) ?? { ...r, spotIds: [] }
-      m.spotIds.push(spot.id)
+      // A spot can have two alerts with the same event (e.g. two Small Craft Advisories).
+      if (!m.spotIds.includes(spot.id)) m.spotIds.push(spot.id)
       m.updatedAt = latest(m.updatedAt, r.updatedAt)
       merged.set(key, m)
     }
@@ -163,7 +171,7 @@ export function safetyVerdict({ alerts, weather, missing = [], updatedAt = {}, s
         if (key === 'waveFt' && spot.type === 'bay') continue
         const vals = (weather.spots[spot.id] ?? []).map((h) => h[key]).filter(Number.isFinite)
         if (!vals.length) continue
-        const max = Math.max(...vals)
+        const max = SHOWN[key](Math.max(...vals))
         const w = worst[key]
         if (w.v == null || max > w.v) w.v = max
         const over = key === 'feelsLikeF' ? max >= HEAT_INDEX_F : key === 'windMph' ? max > WIND_MPH : max > HIGH_WAVES_FT
@@ -173,19 +181,19 @@ export function safetyVerdict({ alerts, weather, missing = [], updatedAt = {}, s
     const src = { source: WEATHER_SOURCE, updatedAt: updatedAt.weather ?? null }
     const { feelsLikeF: heat, windMph: wind, waveFt: waves } = worst
     if (heat.v != null) {
-      const f = Math.round(heat.v)
+      const f = heat.v
       add(heat.ids.length ? 'caution' : 'go', heat.ids.length
         ? { signal: 'heat', level: 'moderate', text: `Feels like up to ${f}°F. That's dangerous heat: bring lots of water, wear a hat and rest in the shade.`, ...src }
         : { signal: 'heat', level: 'none', text: `Feels like up to ${f}°F. No heat danger.`, ...src })
     }
     if (wind.v != null) {
-      const mph = Math.round(wind.v)
+      const mph = wind.v
       add(wind.ids.length ? 'caution' : 'go', wind.ids.length
         ? { signal: 'wind', level: 'moderate', text: `${where(wind.ids, spots)}Wind up to ${mph} mph. Strong wind makes casting hard and waves rough. Pick a sheltered spot.`, ...src }
         : { signal: 'wind', level: 'low', text: `Wind up to ${mph} mph. Fine for fishing from shore.`, ...src })
     }
     if (waves.v != null) {
-      const ft = Math.round(waves.v * 10) / 10
+      const ft = waves.v
       add(waves.ids.length ? 'caution' : 'go', waves.ids.length
         ? { signal: 'waves', level: 'moderate', text: `${where(waves.ids, spots)}Waves up to ${ft} ft. Stay out of the water and back from the pier edge.`, ...src }
         : { signal: 'waves', level: 'low', text: `Waves up to ${ft} ft. Calm enough from shore.`, ...src })

@@ -518,12 +518,12 @@
           "likelihood": "high"
         },
         {
-          "id": "black-drum",
-          "likelihood": "medium"
-        },
-        {
           "id": "hardhead-catfish",
           "likelihood": "high"
+        },
+        {
+          "id": "black-drum",
+          "likelihood": "medium"
         }
       ],
       "draw": "whiting",

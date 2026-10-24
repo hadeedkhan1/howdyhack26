@@ -121,3 +121,173 @@ test('HTTP: snapshot=demo still served, bad params rejected', async () => {
     server.close()
   }
 })
+
+// --- Edge cases and realistic days ----------------------------------------------------------
+
+import { checkPlan } from './contract-helpers.js'
+import { addDays, chicagoHHMM } from '../services/time.js'
+import { sunTimes } from '../services/scoring.js'
+
+// Real NOAA Pier 21 hourly tide, Oct 25 2026 from 00:00 CDT.
+const REAL_TIDE_FT = [1.401, 1.494, 1.573, 1.603, 1.555, 1.407, 1.165, 0.878, 0.622, 0.458, 0.41, 0.478,
+  0.654, 0.914, 1.218, 1.514, 1.751, 1.887, 1.9, 1.811, 1.68, 1.57, 1.509, 1.496]
+
+// Fakes for any start/days. `alerts(date)` returns NWS alert reasons per spot for that date.
+function scenario({ start: s, days: n = 1, weather = {}, alerts = () => [], rip = null, waterF = 75, nwsMissing = [] }) {
+  const ds = Array.from({ length: n }, (_, i) => addDays(s, i))
+  const hours = (d) => {
+    const from = chicagoMidnight(d).getTime()
+    return Array.from({ length: (chicagoMidnight(addDays(d, 1)) - from) / HOUR }, (_, i) => new Date(from + i * HOUR).toISOString())
+  }
+  return {
+    getTides: async () => ({
+      days: ds.map((date) => ({ date, tide: hours(date).map((t, i) => ({ t, ft: REAL_TIDE_FT[i % 24] })), hilo: [] })),
+      waterTemp: { f: waterF, observedAt: sent, stale: false, source: 'NOAA' }, salinity: null, source: 'NOAA', updatedAt: sent, missing: ['salinity'],
+    }),
+    getWeather: async () => ({
+      days: ds.map((date) => ({
+        date, missing: [],
+        spots: Object.fromEntries(spots.map((sp) => [sp.id, hours(date).map((t) => ({
+          t, tempF: 76, feelsLikeF: 79, windMph: 10, windFromDeg: 140, pressureHpa: 1015, waveFt: 2, ...weather,
+        }))])),
+      })),
+      source: 'Open-Meteo', updatedAt: sent,
+    }),
+    getAlerts: async () => ({
+      days: ds.map((date) => ({
+        date, rip, missing: [...(rip ? [] : ['rip_current']), ...nwsMissing],
+        spots: Object.fromEntries(spots.map((sp) => [sp.id, alerts(date, sp.type)])),
+      })),
+      source: 'NWS', updatedAt: sent,
+    }),
+  }
+}
+const reason = (signal, verdict, event, text = event) => ({ signal, level: verdict === 'no' ? 'high' : 'moderate', verdict, event, text, source: 'NWS', updatedAt: sent })
+
+test('realistic quiet fall day (live NWS has no rip forecast): caution, windows in daylight, contract ok', async () => {
+  const plan = await buildPlan({ start: '2026-10-25', days: 1 }, scenario({ start: '2026-10-25' }))
+  checkPlan(plan, { snapshot: false })
+  const [day] = plan.days
+  assert.equal(day.safety.verdict, 'caution', 'unknown rip risk is never "go"')
+  assert.ok(day.safety.reasons.some((r) => r.signal === 'rip_current' && r.level === 'unknown'))
+  assert.ok(day.windows.length >= 1, 'a normal day has somewhere to fish')
+  const { sunrise, sunset } = sunTimes('2026-10-25')
+  for (const w of day.windows) {
+    assert.ok(w.start >= chicagoHHMM(new Date(sunrise - HOUR)) && w.start <= chicagoHHMM(sunset), `${w.start} is in daylight`)
+    assert.ok(w.end <= chicagoHHMM(new Date(sunset.getTime() + HOUR)), `${w.end} ends by last light`)
+  }
+  assert.equal(day.tide.length, 24)
+})
+
+test('realistic: Beach Hazards Statement (moderate rip) is caution, Rip Current Statement is no', async () => {
+  const moderate = scenario({
+    start: '2026-10-25', rip: { level: 'moderate' },
+    alerts: (_d, type) => (type === 'bay' ? [] : [reason('rip_current', 'caution', 'Beach Hazards Statement')]),
+  })
+  assert.equal((await buildPlan({ start: '2026-10-25' }, moderate)).days[0].safety.verdict, 'caution')
+  const high = scenario({
+    start: '2026-10-25', rip: { level: 'high' },
+    alerts: (_d, type) => (type === 'surf' ? [reason('rip_current', 'no', 'Rip Current Statement')] : type === 'pier' ? [reason('rip_current', 'caution', 'Rip Current Statement')] : []),
+  })
+  const plan = await buildPlan({ start: '2026-10-25' }, high)
+  checkPlan(plan)
+  assert.equal(plan.days[0].safety.verdict, 'no')
+  assert.match(plan.days[0].safety.reasons[0].text, /^Beach side: /)
+})
+
+test('realistic: a tropical storm warning only on day 2 makes day 2 "no" and leaves day 1 alone', async () => {
+  const f = scenario({
+    start: '2026-10-25', days: 2, rip: { level: 'moderate' },
+    alerts: (d) => (d === '2026-10-26' ? [reason('tropical', 'no', 'Tropical Storm Warning')] : []),
+  })
+  const plan = await buildPlan({ start: '2026-10-25', days: 2 }, f)
+  checkPlan(plan)
+  assert.notEqual(plan.days[0].safety.verdict, 'no')
+  assert.equal(plan.days[1].safety.verdict, 'no')
+})
+
+test('realistic: summer heat (feels like 107) and windy cold front (25 mph) are cautions', async () => {
+  for (const weather of [{ feelsLikeF: 107 }, { windMph: 25, windFromDeg: 350 }]) {
+    const plan = await buildPlan({ start: '2026-10-25' }, scenario({ start: '2026-10-25', weather, rip: { level: 'low' } }))
+    checkPlan(plan)
+    assert.equal(plan.days[0].safety.verdict, 'caution', JSON.stringify(weather))
+  }
+})
+
+test('trip 3+ days out: NWS has nothing yet, so caution with an explanation', async () => {
+  const plan = await buildPlan({ start: '2026-10-29' }, scenario({ start: '2026-10-29', nwsMissing: ['nws_alerts'] }))
+  checkPlan(plan)
+  assert.equal(plan.days[0].safety.verdict, 'caution')
+  assert.ok(plan.days[0].safety.reasons.some((r) => r.signal === 'nws_alerts' && r.level === 'unknown'))
+})
+
+test('DST start (Mar 14, 2027): 23 tide points, windows in CDT, contract ok', async () => {
+  const plan = await buildPlan({ start: '2027-03-14' }, scenario({ start: '2027-03-14', waterF: 64 }))
+  checkPlan(plan)
+  assert.equal(plan.days[0].tide.length, 23)
+})
+
+test('both DST-change days in one 2-day plan pass the contract', async () => {
+  const plan = await buildPlan({ start: '2026-10-31', days: 2 }, scenario({ start: '2026-10-31', days: 2 }))
+  checkPlan(plan)
+  assert.deepEqual(plan.days.map((d) => d.tide.length), [24, 25])
+})
+
+test('a service that returns the wrong shape (bug) degrades like a failure, not a 500', async () => {
+  const f = scenario({ start: '2026-10-25' })
+  const plan = await buildPlan({ start: '2026-10-25' }, { ...f, getWeather: async () => ({}), getTides: async () => undefined, getAlerts: async () => ({ days: null }) })
+  checkPlan(plan)
+  const [day] = plan.days
+  assert.equal(day.safety.verdict, 'caution')
+  for (const m of ['weather', 'tide', 'nws_alerts']) assert.ok(day.missing.includes(m), m)
+})
+
+test('a service answering for the wrong dates counts as missing for the asked date', async () => {
+  const wrong = scenario({ start: '2026-11-15', rip: { level: 'low' } })
+  const plan = await buildPlan({ start: '2026-10-25' }, wrong)
+  checkPlan(plan)
+  assert.deepEqual(plan.days[0].tide, [])
+  assert.ok(plan.days[0].missing.includes('weather'))
+  assert.equal(plan.days[0].safety.verdict, 'caution')
+})
+
+test('the same inputs give the same plan (draw and windows are deterministic)', async () => {
+  const f = scenario({ start: '2026-10-25' })
+  const a = await buildPlan({ start: '2026-10-25' }, f)
+  const b = await buildPlan({ start: '2026-10-25' }, f)
+  assert.deepEqual({ ...a, generatedAt: 0 }, { ...b, generatedAt: 0 })
+})
+
+test('HTTP: impossible dates and bad days are 400s with a JSON error', async () => {
+  const app = express().use('/api/plan', planRouter)
+  const server = app.listen(0)
+  const base = `http://localhost:${server.address().port}/api/plan`
+  try {
+    const bad = [
+      'start=2026-02-30', // Date.parse rolls this over to March 2
+      'start=2026-04-31',
+      'start=2026-13-01',
+      'start=0050-01-01', // Date.UTC maps years 0-99 to 1900s
+      'start=20261024',
+      'start=2026-10-24T00:00',
+      'start=2026-10-24&start=2026-10-25',
+      'start=',
+      'start=2026-10-24&days=0',
+      'start=2026-10-24&days=3',
+      'start=2026-10-24&days=1.5',
+      'start=2026-10-24&days=abc',
+      'start=2026-10-24&days=',
+      'start=2026-10-24&days=-1',
+    ]
+    for (const q of bad) {
+      const res = await fetch(`${base}?${q}`)
+      assert.equal(res.status, 400, q)
+      assert.ok((await res.json()).error, `${q}: has an error message`)
+    }
+    const demo = await fetch(`${base}?snapshot=demo&start=whatever&days=9`)
+    assert.equal(demo.status, 200, 'snapshot ignores the other params')
+    assert.equal((await demo.json()).snapshot, true)
+  } finally {
+    server.close()
+  }
+})

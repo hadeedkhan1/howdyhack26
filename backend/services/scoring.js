@@ -4,7 +4,7 @@
 // split 50 points 35/25/15/15/10 (tide/water temp/wind/light/pressure).
 // Windows = consecutive hours >= WINDOW_MIN; the plan keeps the best ones that don't overlap.
 import { species as allSpecies } from './data.js'
-import { chicagoHHMM } from './time.js'
+import { chicagoDate, chicagoHHMM } from './time.js'
 
 export const SCORE_BASE = 50
 export const WINDOW_MIN = 60
@@ -22,6 +22,14 @@ const clamp = (x, lo, hi) => Math.min(hi, Math.max(lo, x))
 // Maps x linearly so that `lo` -> -1 and `hi` -> +1 (clamped).
 const ramp = (x, lo, hi) => clamp(((x - lo) / (hi - lo)) * 2 - 1, -1, 1)
 const effectOf = (input, factor) => Math.round(factor * WEIGHTS[input]) || 0
+// species.json may hold nulls or "NEEDS CHECK" (AGENTS.md): treat those as unknown, as species.js does.
+// [min, max] if both are numbers in order, else null.
+const tempRange = (s) => {
+  const r = s.waterTempF
+  return Array.isArray(r) && r.length === 2 && r.every(Number.isFinite) && r[0] <= r[1] ? r : null
+}
+// Unknown spot types count as every spot.
+const livesAt = (s, spotType) => !Array.isArray(s.spotTypes) || !s.spotTypes.length || s.spotTypes.includes(spotType)
 
 // --- Inputs -----------------------------------------------------------------------------
 
@@ -58,8 +66,7 @@ export function waterTempWhy(waterTempF, spotType, species = allSpecies) {
     return { input: 'waterTemp', value: 'No water temperature reading', effect: 0, label: 'data' }
   }
   const temp = `${Math.round(waterTempF)}°F`
-  const here = species.filter((s) => !s.spotTypes?.length || s.spotTypes.includes(spotType))
-  const ranged = here.filter((s) => s.waterTempF?.every(Number.isFinite))
+  const ranged = species.filter((s) => livesAt(s, spotType) && tempRange(s))
   if (!ranged.length) {
     const [lo, hi] = GENERIC_TEMP_F
     const ok = waterTempF >= lo && waterTempF <= hi
@@ -69,7 +76,7 @@ export function waterTempWhy(waterTempF, spotType, species = allSpecies) {
       effect: effectOf('waterTemp', ok ? 0.5 : -1), label: 'rule of thumb',
     }
   }
-  const fits = ranged.filter((s) => waterTempF >= s.waterTempF[0] && waterTempF <= s.waterTempF[1])
+  const fits = ranged.filter((s) => waterTempF >= tempRange(s)[0] && waterTempF <= tempRange(s)[1])
   const names = fits.slice(0, 2).map((s) => s.name.toLowerCase())
   return {
     input: 'waterTemp',
@@ -102,8 +109,10 @@ export function windWhy({ windMph, windFromDeg } = {}, windExposure) {
 }
 
 // Sunrise and sunset (UTC Dates) for a Chicago calendar date, NOAA's simplified solar formula.
-// Accurate to a few minutes, plenty for a dawn/dusk bonus.
-export function sunTimes(date, lat = GALVESTON.lat, lon = GALVESTON.lon) {
+// Accurate to a few minutes, plenty for a dawn/dusk bonus. Missing or "NEEDS CHECK" coordinates
+// fall back to Galveston (otherwise every hour would count as dark and there'd be no windows).
+export function sunTimes(date, lat, lon) {
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) ({ lat, lon } = GALVESTON)
   const [y, m, d] = date.split('-').map(Number)
   const noonUtc = Date.UTC(y, m - 1, d, 12)
   const dayOfYear = (noonUtc - Date.UTC(y, 0, 0)) / 864e5
@@ -159,7 +168,7 @@ export function totalScore(why, base = SCORE_BASE) {
 
 // One spot, one hour. All inputs are plain values so this is easy to test.
 export function scoreHour({ spot, t, tideRate: rate, waterTempF, weather, pressureChange3h, sun, species }) {
-  sun ??= sunTimes(t.slice(0, 10), spot.lat ?? undefined, spot.lon ?? undefined)
+  sun ??= sunTimes(chicagoDate(new Date(t)), spot.lat, spot.lon)
   const why = [
     tideWhy(rate),
     waterTempWhy(waterTempF, spot.type, species),
@@ -167,7 +176,9 @@ export function scoreHour({ spot, t, tideRate: rate, waterTempF, weather, pressu
     lightWhy(t, sun),
     pressureWhy(pressureChange3h),
   ]
-  return { t, score: totalScore(why), why, daylight: isDaylight(t, sun) }
+  // The whole hour must be light, so a window never ends after dark (beginners packing up blind).
+  const daylight = isDaylight(t, sun) && isDaylight(new Date(t).getTime() + HOUR_MS, sun)
+  return { t, score: totalScore(why), why, daylight }
 }
 
 // Pressure change over the 3 hours before `i` (or as many as exist).
@@ -183,7 +194,7 @@ function pressureChange(hours, i) {
 // Scores every weather hour of one Chicago day for one spot.
 // weatherHours: weather.js day.spots[spotId]; tide: tides.js day.tide.
 export function scoreSpotDay({ spot, date, tide = [], waterTempF = null, weatherHours = [], species = allSpecies }) {
-  const sun = sunTimes(date, spot.lat ?? undefined, spot.lon ?? undefined)
+  const sun = sunTimes(date, spot.lat, spot.lon)
   return weatherHours.map((w, i) => scoreHour({
     spot, t: w.t, tideRate: tideRate(tide, w.t), waterTempF, weather: w,
     pressureChange3h: pressureChange(weatherHours, i), sun, species,
@@ -192,7 +203,8 @@ export function scoreSpotDay({ spot, date, tide = [], waterTempF = null, weather
 
 // --- Windows ------------------------------------------------------------------------------
 
-// Runs of consecutive daylight hours scoring >= WINDOW_MIN (no night windows). Long runs are trimmed to their best
+// Runs of consecutive daylight hours scoring >= WINDOW_MIN (no night windows; an hour counts as
+// daylight only if it ends by 1h after sunset). Long runs are trimmed to their best
 // `maxHours` block so one spot can't swallow the whole day. Window score/why = peak hour.
 export function buildWindows(spotId, hours, { maxHours = 3 } = {}) {
   const runs = []
