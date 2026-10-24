@@ -1,0 +1,44 @@
+[
+  {
+    "id": "gisp-beach",
+    "name": "Galveston Island State Park — Beach side",
+    "type": "surf",
+    "lat": null,
+    "lon": null,
+    "inStatePark": true,
+    "windExposure": "high",
+    "noaaStation": "8771450",
+    "fee": "NEEDS CHECK",
+    "amenities": [],
+    "beginnerNotes": "NEEDS CHECK",
+    "sourceUrl": "https://tpwd.texas.gov/state-parks/galveston-island"
+  },
+  {
+    "id": "gisp-bay",
+    "name": "Galveston Island State Park — Bay side",
+    "type": "bay",
+    "lat": null,
+    "lon": null,
+    "inStatePark": true,
+    "windExposure": "low",
+    "noaaStation": "8771450",
+    "fee": "NEEDS CHECK",
+    "amenities": [],
+    "beginnerNotes": "NEEDS CHECK",
+    "sourceUrl": "https://tpwd.texas.gov/state-parks/galveston-island"
+  },
+  {
+    "id": "galveston-pier",
+    "name": "Galveston Fishing Pier",
+    "type": "pier",
+    "lat": null,
+    "lon": null,
+    "inStatePark": false,
+    "windExposure": "high",
+    "noaaStation": "8771450",
+    "fee": "NEEDS CHECK",
+    "amenities": [],
+    "beginnerNotes": "NEEDS CHECK",
+    "sourceUrl": "NEEDS CHECK"
+  }
+]

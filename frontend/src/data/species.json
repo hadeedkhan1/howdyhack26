@@ -1,0 +1,163 @@
+[
+  {
+    "id": "croaker",
+    "name": "Atlantic croaker",
+    "aka": [],
+    "photo": "",
+    "silhouette": "",
+    "spotTypes": [],
+    "waterTempF": [
+      null,
+      null
+    ],
+    "bait": [],
+    "rig": "",
+    "howTo": "",
+    "handling": "",
+    "eat": {
+      "ok": null,
+      "note": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "funFact": "",
+    "photoCredit": ""
+  },
+  {
+    "id": "whiting",
+    "name": "Whiting (southern kingfish)",
+    "aka": [],
+    "photo": "",
+    "silhouette": "",
+    "spotTypes": [],
+    "waterTempF": [
+      null,
+      null
+    ],
+    "bait": [],
+    "rig": "",
+    "howTo": "",
+    "handling": "",
+    "eat": {
+      "ok": null,
+      "note": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "funFact": "",
+    "photoCredit": ""
+  },
+  {
+    "id": "sheepshead",
+    "name": "Sheepshead",
+    "aka": [],
+    "photo": "",
+    "silhouette": "",
+    "spotTypes": [],
+    "waterTempF": [
+      null,
+      null
+    ],
+    "bait": [],
+    "rig": "",
+    "howTo": "",
+    "handling": "",
+    "eat": {
+      "ok": null,
+      "note": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "funFact": "",
+    "photoCredit": ""
+  },
+  {
+    "id": "black-drum",
+    "name": "Black drum",
+    "aka": [],
+    "photo": "",
+    "silhouette": "",
+    "spotTypes": [],
+    "waterTempF": [
+      null,
+      null
+    ],
+    "bait": [],
+    "rig": "",
+    "howTo": "",
+    "handling": "",
+    "eat": {
+      "ok": null,
+      "note": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "funFact": "",
+    "photoCredit": ""
+  },
+  {
+    "id": "red-drum",
+    "name": "Red drum (redfish)",
+    "aka": [],
+    "photo": "",
+    "silhouette": "",
+    "spotTypes": [],
+    "waterTempF": [
+      null,
+      null
+    ],
+    "bait": [],
+    "rig": "",
+    "howTo": "",
+    "handling": "",
+    "eat": {
+      "ok": null,
+      "note": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "funFact": "",
+    "photoCredit": ""
+  },
+  {
+    "id": "speckled-trout",
+    "name": "Speckled trout (spotted seatrout)",
+    "aka": [],
+    "photo": "",
+    "silhouette": "",
+    "spotTypes": [],
+    "waterTempF": [
+      null,
+      null
+    ],
+    "bait": [],
+    "rig": "",
+    "howTo": "",
+    "handling": "",
+    "eat": {
+      "ok": null,
+      "note": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "funFact": "",
+    "photoCredit": ""
+  },
+  {
+    "id": "hardhead-catfish",
+    "name": "Hardhead catfish",
+    "aka": [],
+    "photo": "",
+    "silhouette": "",
+    "spotTypes": [],
+    "waterTempF": [
+      null,
+      null
+    ],
+    "bait": [],
+    "rig": "",
+    "howTo": "",
+    "handling": "",
+    "eat": {
+      "ok": null,
+      "note": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "funFact": "",
+    "photoCredit": ""
+  }
+]

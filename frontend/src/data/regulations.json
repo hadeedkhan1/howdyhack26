@@ -1,0 +1,73 @@
+{
+  "updated": "NEEDS CHECK",
+  "sourceUrl": "https://tpwd.texas.gov/regulations/outdoor-annual/",
+  "species": {
+    "croaker": {
+      "minIn": null,
+      "maxIn": null,
+      "dailyBag": null,
+      "notes": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "whiting": {
+      "minIn": null,
+      "maxIn": null,
+      "dailyBag": null,
+      "notes": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "sheepshead": {
+      "minIn": null,
+      "maxIn": null,
+      "dailyBag": null,
+      "notes": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "black-drum": {
+      "minIn": null,
+      "maxIn": null,
+      "dailyBag": null,
+      "notes": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "red-drum": {
+      "minIn": null,
+      "maxIn": null,
+      "dailyBag": null,
+      "notes": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "speckled-trout": {
+      "minIn": null,
+      "maxIn": null,
+      "dailyBag": null,
+      "notes": "NEEDS CHECK",
+      "sourceUrl": ""
+    },
+    "hardhead-catfish": {
+      "minIn": null,
+      "maxIn": null,
+      "dailyBag": null,
+      "notes": "NEEDS CHECK",
+      "sourceUrl": ""
+    }
+  },
+  "license": {
+    "rules": [
+      {
+        "condition": "NEEDS CHECK",
+        "result": "NEEDS CHECK",
+        "sourceUrl": ""
+      }
+    ]
+  },
+  "advisories": [
+    {
+      "area": "NEEDS CHECK",
+      "speciesIds": [],
+      "text": "NEEDS CHECK",
+      "sourceUrl": "",
+      "updated": ""
+    }
+  ]
+}

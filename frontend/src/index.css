@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/* Design tokens. Frontend 2 replaces these with the Figma palette and fonts. */
+@theme {
+  --color-navy: #0f2a44;
+  --color-sand: #f3e6c8;
+  --color-seafoam: #7fd1b9;
+  --color-coral: #e8684a;
+  --color-amber: #f2a93b;
+  --radius-card: 1rem;
+}
+
+body {
+  @apply bg-sand text-navy antialiased;
+}
