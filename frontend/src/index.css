@@ -90,6 +90,7 @@ a { color: inherit; }
 .start-hero-copy b { color: #bfe4d4; }
 .hero-bottom { height: 42px; margin: 0 -20px; padding: 0 20px; border-top: 1px solid #ffffff20; font-size: 7px; letter-spacing: .8px; }
 .date-picker-section { margin-top: 27px; }
+.date-picker-section .section-heading h2 { color: #fff; }
 .date-choices { display: grid; gap: 9px; margin-top: 15px; }
 .date-choice { display: flex; align-items: center; min-height: 70px; gap: 12px; padding: 11px 13px; border: 1px solid #e3e8df; border-radius: 15px; background: #fffefa; text-align: left; cursor: pointer; transition: .18s ease; }
 .date-choice:hover, .date-choice.selected { border-color: #65b9a6; background: #eff7ef; box-shadow: 0 4px 14px #25887813; }

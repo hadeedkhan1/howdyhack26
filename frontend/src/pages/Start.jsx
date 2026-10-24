@@ -34,15 +34,13 @@ export default function Start() {
           <div className="start-hero-top"><span className="sun-stamp">✳</span><span>GALVESTON, TEXAS</span><span className="hero-sparkles">✦ · ✦</span></div>
           <div className="hero-landscape"><div className="hero-moon" /><div className="hero-wave wave-one" /><div className="hero-wave wave-two" /><div className="hero-wave wave-three" /><span className="hero-fish">〰</span><span className="hero-lighthouse">⌁</span></div>
           <div className="start-hero-copy"><span className="handwritten">No boat. No big deal.</span><p>We’ll help you figure out <b>when to go, where to cast,</b> and what might bite.</p></div>
-          <div className="hero-bottom"><span>BEGINNER FRIENDLY</span><span>SHORE & PIER ONLY</span><span>✳</span></div>
         </section>
-        <section className="date-picker-section"><div className="section-heading"><div><p className="eyebrow">LET'S GET YOU OUT THERE</p><h2>When's the trip?</h2></div><span className="round-icon">↘</span></div>
+        <section className="date-picker-section"><div className="section-heading"><div><h2>When's the trip?</h2></div><span className="round-icon">↘</span></div>
           <div className="date-choices">{dateChoices.map((choice, index) => <button key={`${choice.title}-${choice.date}`} className={`date-choice ${selectedDate === choice.date ? 'selected' : ''}`} onClick={() => { setSelectedDate(choice.date); go(choice.date) }}>
             <span className="date-choice-icon">{['☼', '↗', '✳'][index]}</span><span><b>{choice.title}</b><small>{choice.note}</small></span><span className="date-choice-arrow">→</span>
           </button>)}</div>
           <label className="custom-date"><span>Planning further ahead?</span><input type="date" value={selectedDate} min={dateChoices[0].date} onChange={(event) => { setSelectedDate(event.target.value); if (event.target.value) go(event.target.value) }} aria-label="Choose a date for your trip" /></label>
         </section>
-        <div className="start-trust"><span>✳</span><p>Built for beginners. Local conditions, plain-language advice, and no fishing jargon.</p></div>
       </div>
     </Screen>
   )

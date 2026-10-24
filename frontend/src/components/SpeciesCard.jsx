@@ -31,7 +31,7 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
         <span className="card-rank">? <small>♣</small></span>
         <div className="silhouette-art"><FishMark /></div>
         <div className="silhouette-copy"><span className="card-kicker">UNCAUGHT · {species.spotTypes?.length ? species.spotTypes.join(' / ') : 'GALVESTON'}</span>
-          <h3>Unknown catch</h3><p>{label(species.howTo, `Try ${species.bait?.length ? species.bait.join(' or ') : 'a simple bottom rig'} and see what bites.`)}</p></div>
+          <h3>Unknown catch</h3></div>
         <span className="card-collect-hint">Tap to reveal the clue ↗</span>
       </button>
     )
