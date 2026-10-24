@@ -323,6 +323,16 @@ test('nws: days more than 48h ahead get "nws_alerts" in missing (no alerts issue
   }
 })
 
+test('nws: days already over get "nws_alerts" in missing (active alerts say nothing about them)', async () => {
+  const r = await getAlerts({ start: addDays(today, -2), days: 2 })
+  for (const d of r.days) {
+    assert.ok(d.missing.includes('nws_alerts'), d.date)
+    assert.ok(d.missing.includes('rip_current'), d.date)
+  }
+  const [now] = (await getAlerts({ start: today })).days
+  assert.ok(!now.missing.includes('nws_alerts'), 'today is still checked')
+})
+
 test('nws: API down with no cache -> "nws_alerts" missing, never throws', async () => {
   api.nws = 'down'
   const r = await getAlerts({ start: today })

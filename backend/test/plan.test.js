@@ -293,3 +293,18 @@ test('HTTP: impossible dates and bad days are 400s with a JSON error', async () 
     server.close()
   }
 })
+
+test('HTTP: unknown /api paths are a JSON 404, not an HTML page', async () => {
+  const { app } = await import('../server.js')
+  const server = app.listen(0)
+  const base = `http://localhost:${server.address().port}/api`
+  try {
+    const res = await fetch(`${base}/plans`)
+    assert.equal(res.status, 404)
+    assert.match(res.headers.get('content-type'), /json/)
+    assert.ok((await res.json()).error)
+    assert.equal((await fetch(`${base}/health`)).status, 200)
+  } finally {
+    server.close()
+  }
+})

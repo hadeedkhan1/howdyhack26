@@ -144,8 +144,9 @@ export function mapAlert(a, spotType) {
 //   alerts: [summary],                         every distinct alert fetched (for debugging)
 //   spots: { <spotId>: { lat, lon, fallback, marineZone } }, source, updatedAt }
 // An alert applies to a day if its [onset, ends] overlaps that Chicago day. A day's `missing`
-// gets "nws_alerts" if any fetch failed, the data is stale, or the day is past the NWS alert
-// horizon; and "rip_current" too if that happens with no rip statement active for a surf spot.
+// gets "nws_alerts" if any fetch failed, the data is stale, the day is past the NWS alert
+// horizon, or the day is already over; and "rip_current" too if that happens with no rip
+// statement active for a surf spot.
 // Never throws.
 export async function getAlerts({ start, days = 1, spots = allSpots }) {
   const dates = Array.from({ length: days }, (_, i) => addDays(start, i))
@@ -213,7 +214,8 @@ export async function getAlerts({ start, days = 1, spots = allSpots }) {
       }
 
       const missing = []
-      const unchecked = failed || stale || from.getTime() - now > HORIZON_MS
+      // A day that's already over can't be checked either: active alerts say nothing about it.
+      const unchecked = failed || stale || from.getTime() - now > HORIZON_MS || to.getTime() <= now
       if (unchecked) missing.push('nws_alerts')
       if (unchecked && surfSpots.length && !rip) missing.push('rip_current')
       return { date, spots: bySpot, rip, missing }

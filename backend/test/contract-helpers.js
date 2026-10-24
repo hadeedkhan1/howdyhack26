@@ -58,8 +58,7 @@ export function checkWindow(w, scoreBase, where) {
   assert.equal(w.score, Math.min(100, Math.max(0, scoreBase + sum)), `${where}: score = scoreBase + sum(effects)`)
 }
 
-// opts.tideEndInclusive: the hand-made mock also lists the next midnight's tide point.
-export function checkPlan(plan, { snapshot, tideEndInclusive = false } = {}) {
+export function checkPlan(plan, { snapshot } = {}) {
   assert.ok(isIso(plan.generatedAt), 'generatedAt is ISO')
   assert.equal(typeof plan.snapshot, 'boolean')
   if (snapshot !== undefined) assert.equal(plan.snapshot, snapshot)
@@ -80,7 +79,7 @@ export function checkPlan(plan, { snapshot, tideEndInclusive = false } = {}) {
       assert.ok(Number.isFinite(p.ft), `${where}.tide[${i}].ft`)
       const ms = Date.parse(p.t)
       assert.ok(ms > prev, `${where}.tide sorted, no duplicates`)
-      assert.ok(ms >= from && (tideEndInclusive ? ms <= to : ms < to), `${where}.tide[${i}] inside the Chicago day`)
+      assert.ok(ms >= from && ms < to, `${where}.tide[${i}] inside the Chicago day`)
       prev = ms
     }
 

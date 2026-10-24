@@ -83,9 +83,9 @@ test('regulations.json: one entry per species, filled numbers carry an official 
 })
 
 test('mock/plan.json follows the API contract (the frontend builds against it)', () => {
-  checkPlan(readJson('../mock/plan.json'), { tideEndInclusive: true })
+  checkPlan(readJson('../mock/plan.json'))
 })
 
 test('snapshots/demo.json follows the API contract and is marked as a snapshot', () => {
-  checkPlan(readJson('../snapshots/demo.json'), { snapshot: true, tideEndInclusive: true })
+  checkPlan(readJson('../snapshots/demo.json'), { snapshot: true })
 })

@@ -78,7 +78,7 @@ const GENERIC_ALERT = {
 
 // Missing-data names (from tides/weather/nws) that matter for safety, with what we couldn't check.
 const MISSING_TEXT = {
-  nws_alerts: "We couldn't check weather warnings for this day (too far ahead, or the weather service didn't answer).",
+  nws_alerts: "We couldn't check weather warnings for this day (too far ahead, already over, or the weather service didn't answer).",
   rip_current: "We couldn't get today's rip current risk. Treat the surf as risky and stay out of the water.",
   weather: "We couldn't get the wind and heat forecast.",
   waves: "We couldn't get the wave forecast.",
