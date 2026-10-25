@@ -87,9 +87,8 @@ export default function PlanSlider({ onComplete }) {
           onKeyDown={handleKeyDown}
         >
           <svg viewBox="0 0 36 36" aria-hidden="true">
-            <path d="M3 18c4.1-5.6 12.3-7.7 21.2-3.2L32 9v18l-7.8-5.8C15.3 25.7 7.1 23.6 3 18Z" />
-            <circle cx="12" cy="16" r="1.35" />
-            <path d="M7 12.5 3.2 9.7v16.6L7 23.5" />
+            <path d="M33 18C28.9 12.4 20.7 10.3 11.8 14.8L4 9v18l7.8-5.8C20.7 25.7 28.9 23.6 33 18Z" />
+            <circle cx="24" cy="16" r="1.35" />
           </svg>
         </button>
       </div>
