@@ -23,6 +23,7 @@ export default function Deck() {
   const [speciesId, setSpeciesId] = useState('')
   const [clueId, setClueId] = useState(null)
   const [selectedFishId, setSelectedFishId] = useState(null)
+  const [selectedPhoto, setSelectedPhoto] = useState(null)
   const fileRef = useRef(null)
 
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function Deck() {
         {!loaded ? <div className="loading-card" role="status"><span className="skeleton-line wide" /><span className="skeleton-block" /></div> : <div className="deck-grid">{species.map((item) => {
           const count = counts[item.id] || 0
           return <div className="deck-card-wrap" key={item.id}>
-            {count ? <div className="collected-card"><span className="collected-count" aria-label={`${count} ${count === 1 ? 'catch' : 'catches'}`}>{count}×</span><SpeciesCard species={item} compact catchPhotos={photosBySpecies[item.id]} onClick={() => setSelectedFishId(item.id)} /></div> : <SpeciesCard species={item} mode="silhouette" compact onClick={() => setClueId(item.id)} />}
+            {count ? <div className="collected-card"><span className="collected-count" aria-label={`${count} ${count === 1 ? 'catch' : 'catches'}`}>{count}×</span><SpeciesCard species={item} compact catchPhotos={photosBySpecies[item.id]} onClick={(photo) => { setSelectedFishId(item.id); setSelectedPhoto(photo || null) }} /></div> : <SpeciesCard species={item} mode="silhouette" compact onClick={() => setClueId(item.id)} />}
           </div>
         })}</div>}
         <p className="deck-private-note">Your catches and photos stay on this device.</p>
@@ -90,7 +91,7 @@ export default function Deck() {
       </section></div>}
       {selectedFish && <div className="modal-scrim" role="presentation" onClick={(event) => { if (event.target === event.currentTarget) setSelectedFishId(null) }}><section className="fish-detail-modal" role="dialog" aria-modal="true" aria-labelledby="fish-detail-title">
         <button type="button" className="modal-close" onClick={() => setSelectedFishId(null)} aria-label="Close">×</button>
-        <img className="fish-detail-photo" src={photosBySpecies[selectedFish.id]?.[0] || selectedFish.photo} alt={`${selectedFish.name} catch`} />
+        <img className="fish-detail-photo" src={selectedPhoto || photosBySpecies[selectedFish.id]?.[0] || selectedFish.photo} alt={`${selectedFish.name} catch`} />
         <h2 id="fish-detail-title">{selectedFish.name}</h2>
         {selectedFish.funFact && <div className="fish-fact-panel"><span>FISH FACT</span><p>{selectedFish.funFact}</p><a href={fishFactSources[selectedFish.id]} target="_blank" rel="noreferrer">Texas Parks &amp; Wildlife ↗</a></div>}
         {selectedFish.bait?.length > 0 && <p className="fish-detail-bait"><b>Bait:</b> {selectedFish.bait.join(' · ')}</p>}

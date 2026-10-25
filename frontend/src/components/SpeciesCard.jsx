@@ -14,6 +14,14 @@ function FishMark() {
   </svg>
 }
 
+// Half-arc arrow for stepping through catch photos; the left one is mirrored in CSS.
+function ArcArrow({ direction }) {
+  return <svg className={`arc-arrow arc-arrow-${direction}`} viewBox="0 1 30 16" aria-hidden="true">
+    <path d="M4.5 12.7A11 11 0 0 1 25.5 12.7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+    <path d="M25.5 7.7 25.5 12.7 20.6 11.8" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+}
+
 // The playing card used on Hand, Deck and the draw.
 // mode: "face" (full card), "silhouette" (not collected yet), "back" (card back for flips).
 export default function SpeciesCard({ species, mode = 'face', compact = false, likelihood, catchPhoto, catchPhotos, onClick }) {
@@ -52,8 +60,8 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
   }
 
   return (
-    <article className={`species-card face-card ${compact ? 'compact' : ''} ${expanded ? 'expanded' : ''}`}>
-      <button type="button" className="card-main" onClick={() => { if (onClick) onClick(); else setExpanded(!expanded) }} aria-expanded={onClick ? undefined : expanded}>
+    <article className={`species-card face-card ${compact ? 'compact' : ''} ${expanded ? 'expanded' : ''} ${compact && photoList.length > 1 ? 'has-photo-controls' : ''}`}>
+      <button type="button" className="card-main" onClick={() => { if (onClick) onClick(photoList.length ? activePhoto : undefined); else setExpanded(!expanded) }} aria-expanded={onClick ? undefined : expanded}>
         <span className="card-rank">{rank}<small>{suit}</small></span>
         <div className={`card-art ${photoList.length ? 'catch-photo-art' : ''}`}>{activePhoto ? <img key={activePhotoIndex} src={activePhoto} alt={`${species.name} catch photo ${activePhotoIndex + 1} of ${photoList.length}`} /> : <FishMark />}</div>
         <div className="card-information"><div className="card-title-row"><h3>{species.name}</h3>{likelihood && <span className={`likelihood likelihood-${likelihood}`}>{likelihood}</span>}</div>
@@ -63,9 +71,9 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
         </div>
       </button>
       {compact && photoList.length > 1 && <div className="photo-cycle-controls" role="group" aria-label={`${species.name} catch photos`} onMouseEnter={() => { pauseCycle.current = true }} onMouseLeave={() => { pauseCycle.current = false }} onFocus={() => { pauseCycle.current = true }} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) pauseCycle.current = false }}>
-        <button type="button" onClick={() => stepPhoto(-1)} aria-label="Previous photo">‹</button>
+        <button type="button" onClick={() => stepPhoto(-1)} aria-label="Previous photo"><ArcArrow direction="left" /></button>
         <span aria-live="off">{activePhotoIndex + 1}/{photoList.length}</span>
-        <button type="button" onClick={() => stepPhoto(1)} aria-label="Next photo">›</button>
+        <button type="button" onClick={() => stepPhoto(1)} aria-label="Next photo"><ArcArrow direction="right" /></button>
       </div>}
       {compact && expanded && <div className="compact-details"><p><b>How to rig:</b> {label(species.rig)}</p><p><b>Handling:</b> {label(species.handling)}</p><p><b>Limits:</b> {label(regulations.species[species.id]?.notes, 'Check TPWD before keeping')}</p></div>}
     </article>

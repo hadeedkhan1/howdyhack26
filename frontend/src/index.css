@@ -757,11 +757,14 @@ body { background: #102f35; }
 .log-catch-button { min-height: 50px; border-radius: 16px; }
 .deck-grid { gap: 14px; }
 .collected-count { top: 9px; right: 9px; padding: 6px 9px; border: 1px solid #ffffff; box-shadow: 0 3px 10px #143e3024; }
-.photo-cycle-controls { position: absolute; z-index: 5; top: 33px; right: 5px; left: 5px; display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
-.photo-cycle-controls button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #ffffff8c; border-radius: 50%; background: #113e4678; color: #fffdf5; font-size: 15px; line-height: 1; box-shadow: 0 2px 8px #09292b24; cursor: pointer; pointer-events: auto; backdrop-filter: blur(6px); transition: background .18s ease, transform .18s ease; }
-.photo-cycle-controls button:hover { background: #145e61db; transform: scale(1.04); }
-.photo-cycle-controls > span { padding: 3px 7px; border: 1px solid #ffffff70; border-radius: 99px; background: #113e468c; color: #fffdf5; font-size: 9px; font-weight: 700; box-shadow: 0 2px 8px #09292b24; opacity: .88; transition: opacity .18s ease; pointer-events: none; backdrop-filter: blur(6px); }
-.photo-cycle-controls:hover > span, .photo-cycle-controls:focus-within > span { opacity: 1; }
+.photo-cycle-controls { position: absolute; z-index: 5; top: 7px; right: 44px; left: 32px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; justify-items: center; pointer-events: none; }
+.photo-cycle-controls button { position: relative; display: grid; place-items: center; width: 30px; height: 28px; padding: 0; border: 0; border-radius: 99px; background: transparent; color: #1b5a52; cursor: pointer; pointer-events: auto; transition: background .18s ease, transform .18s ease; }
+.photo-cycle-controls button::after { content: ''; position: absolute; inset: -6px 0; }
+.photo-cycle-controls button:hover, .photo-cycle-controls button:focus-visible { background: #1b5a521a; transform: scale(1.06); }
+.photo-cycle-controls .arc-arrow { width: 28px; height: 15px; }
+.photo-cycle-controls .arc-arrow-left { transform: scaleX(-1); }
+.photo-cycle-controls > span { min-width: 22px; padding: 2px 4px; border-radius: 99px; background: #e4f1e3; color: #315e4a; font-size: 9px; font-weight: 800; text-align: center; pointer-events: none; }
+.has-photo-controls .card-art { margin-top: 9px; }
 .catch-modal, .clue-modal { border-radius: 30px; }
 .bottom-nav { width: min(calc(100% - 34px), 420px); min-height: 82px; }
 .nav-item { font-size: 11px; }
