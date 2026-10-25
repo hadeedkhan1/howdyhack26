@@ -705,21 +705,21 @@ body { color: var(--ink); }
   --orange: #dda75f;
 }
 body { background: #102f35; }
-.ambient-map .leaflet-container { filter: blur(8px) saturate(.62) brightness(.48); }
-.ambient-map::after { background: linear-gradient(145deg, rgba(7, 30, 39, .48), rgba(19, 69, 72, .32) 48%, rgba(7, 26, 37, .6)); }
+.ambient-map .leaflet-container { filter: blur(2px) saturate(.9) brightness(.78); }
+.ambient-map::after { background: linear-gradient(145deg, rgba(7, 30, 39, .2), rgba(19, 69, 72, .12) 48%, rgba(7, 26, 37, .27)); }
 .ambient-map-credit { padding: 6px 10px; border-color: #ffffff42; background: #102f387e; color: #eef1e9; font-size: 10px; }
-.app-shell { width: min(100%, 560px); background: linear-gradient(155deg, rgba(240, 246, 238, .24), rgba(225, 238, 232, .13) 52%, rgba(236, 236, 219, .2)); box-shadow: 0 32px 100px #061b25a3, inset 0 1px #ffffff66; backdrop-filter: blur(34px) saturate(125%); }
-.topbar { height: 78px; background: rgba(246, 247, 235, .66); border-bottom-color: #ffffffa3; }
+.app-shell { width: min(100%, 560px); background: linear-gradient(155deg, rgba(240, 246, 238, .05), rgba(225, 238, 232, .025) 52%, rgba(236, 236, 219, .045)); box-shadow: 0 32px 100px #061b2570, inset 0 1px #ffffff66; backdrop-filter: blur(6px) saturate(115%); }
+.topbar { height: 78px; background: rgba(246, 247, 235, .24); border-bottom-color: #ffffffa3; }
 .brand { color: #12363b; font-size: 21px; letter-spacing: -.9px; }
 .brand-mark { background: linear-gradient(145deg, #1c9183, #145d62); box-shadow: 0 5px 16px #0f65574d, inset 0 1px #ffffff94; }
 .screen-content { padding-right: 22px; padding-left: 22px; }
 .page-heading { padding: 30px 2px 24px; }
 .page-heading h1 { color: #fff9e9; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(38px, 9vw, 49px); font-weight: 500; line-height: 1; letter-spacing: -1.6px; text-shadow: 0 3px 24px #051f2bbb; }
 .page-heading > .eyebrow { color: #e8d9b7; }
-.panel, .fishing-rating, .loading-card, .map-loading, .chart-loading { border-color: #ffffffc7; border-radius: 25px; background: linear-gradient(145deg, rgba(255, 254, 247, .87), rgba(245, 247, 235, .7)); box-shadow: 0 18px 46px #0a313021, inset 0 1px #ffffff; backdrop-filter: blur(28px) saturate(150%); }
+.panel, .fishing-rating, .loading-card, .map-loading, .chart-loading { border-color: #ffffffc7; border-radius: 25px; background: linear-gradient(145deg, rgba(255, 254, 247, .59), rgba(245, 247, 235, .44)); box-shadow: 0 18px 46px #0a313021, inset 0 1px #ffffff; backdrop-filter: blur(12px) saturate(140%); }
 .section-heading h2, .deck-tools h2 { color: #173d3d; font-family: Georgia, 'Times New Roman', serif; font-size: 27px; font-weight: 600; letter-spacing: -.7px; }
 .round-icon, .condition-spark, .why-symbol { background: linear-gradient(145deg, #e5f3e8, #d4ebe1); color: #176e68; box-shadow: 0 4px 12px #1c625014, inset 0 1px #fff; }
-.start-hero, .plan-hero, .deck-summary { border: 1px solid #ffffff68; border-radius: 30px; background: linear-gradient(145deg, rgba(14, 81, 82, .96), rgba(13, 44, 56, .97)); box-shadow: 0 23px 55px #092b3761, inset 0 1px #ffffff45; }
+.start-hero, .plan-hero, .deck-summary { border: 1px solid #ffffff68; border-radius: 30px; background: linear-gradient(145deg, rgba(14, 81, 82, .75), rgba(13, 44, 56, .77)); box-shadow: 0 23px 55px #092b3761, inset 0 1px #ffffff45; backdrop-filter: blur(6px); }
 .date-choice, .window-card { border-color: #ffffffd1; background: linear-gradient(145deg, rgba(255, 254, 248, .91), rgba(241, 246, 237, .78)); box-shadow: 0 8px 25px #0b393019, inset 0 1px #fff; }
 .date-choice:hover, .date-choice.selected, .window-card:hover, .window-card.selected { border-color: #74bbaa; background: linear-gradient(145deg, #fbfff6, #e3f3e9); box-shadow: 0 12px 30px #0d61522a, inset 0 0 0 1px #7fc7b8; }
 .date-choice { min-height: 76px; border-radius: 20px; }
@@ -744,7 +744,7 @@ body { background: #102f35; }
 .plan-hero-stats { margin-top: 19px; padding-top: 13px; }
 .spot-panel, .tide-panel { padding: 20px; }
 .satellite-map { height: 250px; border-radius: 20px; }
-.windows-section { padding: 21px; border: 1px solid #ffffff7a; border-radius: 26px; background: linear-gradient(145deg, rgba(20, 60, 65, .9), rgba(15, 43, 54, .94)); box-shadow: 0 18px 45px #081f2d55, inset 0 1px #ffffff2e; }
+.windows-section { padding: 21px; border: 1px solid #ffffff7a; border-radius: 26px; background: linear-gradient(145deg, rgba(20, 60, 65, .71), rgba(15, 43, 54, .74)); box-shadow: 0 18px 45px #081f2d55, inset 0 1px #ffffff2e; backdrop-filter: blur(6px); }
 .windows-section .windows-intro { color: #dce9dc; font-size: 13px; }
 .estimate-pill { border-color: #e0c38c; background: #eedcba; color: #6f552c; }
 .window-card { min-height: 82px; border-radius: 18px; }
