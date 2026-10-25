@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { regulations } from '../services/content'
 
 const ranks = ['A', '2', '3', '4', '5', '6', '7']
@@ -16,14 +16,30 @@ function FishMark() {
 
 // The playing card used on Hand, Deck and the draw.
 // mode: "face" (full card), "silhouette" (not collected yet), "back" (card back for flips).
-export default function SpeciesCard({ species, mode = 'face', compact = false, likelihood, catchPhoto, onClick }) {
+export default function SpeciesCard({ species, mode = 'face', compact = false, likelihood, catchPhoto, catchPhotos, onClick }) {
   const [expanded, setExpanded] = useState(false)
+  const [photoIndex, setPhotoIndex] = useState(0)
+  const pauseCycle = useRef(false)
+  const photoList = catchPhotos?.length ? catchPhotos : catchPhoto ? [catchPhoto] : []
+  const activePhotoIndex = photoList.length ? photoIndex % photoList.length : 0
+  const activePhoto = photoList[activePhotoIndex] || species?.photo
+  const rank = species ? ranks[Math.max(0, Object.keys(regulations.species).indexOf(species.id))] || '★' : '★'
+  const suit = species ? suits[Math.max(0, Object.keys(regulations.species).indexOf(species.id)) % suits.length] : '♣'
+
+  useEffect(() => {
+    if (photoList.length < 2 || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined
+    const timer = window.setInterval(() => {
+      if (!pauseCycle.current) setPhotoIndex((index) => (index + 1) % photoList.length)
+    }, 3200)
+    return () => window.clearInterval(timer)
+  }, [species?.id, photoList.length])
+
+  const stepPhoto = (direction) => setPhotoIndex((index) => (index + direction + photoList.length) % photoList.length)
+
   if (!species) return null
-  const rank = ranks[Math.max(0, Object.keys(regulations.species).indexOf(species.id))] || '★'
-  const suit = suits[Math.max(0, Object.keys(regulations.species).indexOf(species.id)) % suits.length]
 
   if (mode === 'back') {
-    return <div className="species-card card-back" aria-label="Go Fish card back"><img src="/go-fish-card-back.png" alt="Go Fish" /></div>
+    return <div className="species-card card-back" aria-label="Go Fish card back"><img src="/go-fish-card-back.png" alt="Go Fish" /><svg className="card-back-frame" viewBox="0 0 100 170" preserveAspectRatio="none" aria-hidden="true"><path d="M8 2 C14 0 18 4 24 2 S34 0 40 2 S50 4 56 2 S66 0 72 2 S82 4 88 2 Q98 1 98 9 C100 15 96 19 98 25 S100 35 98 41 S96 51 98 57 S100 67 98 73 S96 83 98 89 L98 89 C100 95 96 99 98 105 S100 115 98 121 S96 131 98 137 S100 147 98 153 Q99 168 91 168 C85 170 81 166 75 168 S65 170 59 168 S49 166 43 168 S33 170 27 168 S17 166 11 168 Q2 168 2 160 C0 154 4 150 2 144 S0 134 2 128 S4 118 2 112 S0 102 2 96 S4 86 2 80 S0 70 2 64 S4 54 2 48 S0 38 2 32 S4 22 2 16 Q1 2 8 2 Z" /></svg></div>
   }
   if (mode === 'silhouette') {
     return (
@@ -39,13 +55,18 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
     <article className={`species-card face-card ${compact ? 'compact' : ''} ${expanded ? 'expanded' : ''}`}>
       <button type="button" className="card-main" onClick={() => { setExpanded(!expanded); onClick?.() }} aria-expanded={expanded}>
         <span className="card-rank">{rank}<small>{suit}</small></span>
-        <div className={`card-art ${catchPhoto ? 'catch-photo-art' : ''}`}>{catchPhoto || species.photo ? <img src={catchPhoto || species.photo} alt={catchPhoto ? `Catch photo of ${species.name}` : species.name} /> : <FishMark />}</div>
+        <div className={`card-art ${photoList.length ? 'catch-photo-art' : ''}`}>{activePhoto ? <img key={activePhotoIndex} src={activePhoto} alt={`${species.name} catch photo ${activePhotoIndex + 1} of ${photoList.length}`} /> : <FishMark />}</div>
         <div className="card-information"><div className="card-title-row"><h3>{species.name}</h3>{likelihood && <span className={`likelihood likelihood-${likelihood}`}>{likelihood}</span>}</div>
           <p className="card-bait"><span className="mini-icon">⌁</span> {species.bait?.length ? species.bait.join(' · ') : 'Bait details soon'}</p>
           {!compact && <><div className="card-rule" /><p className="card-detail"><b>Rig</b><span>{label(species.rig)}</span></p><p className="card-detail"><b>Keep / release</b><span>{label(regulations.species[species.id]?.notes, 'Check current TPWD rules')}</span></p><p className="card-detail"><b>Good to know</b><span>{label(species.handling)}</span></p>
             <p className="eat-note"><span>{species.eat?.ok === true ? '✓' : species.eat?.ok === false ? '!' : '↗'}</span> {species.eat?.ok == null ? 'Check local advisories before eating' : species.eat.note}</p></>}
         </div>
       </button>
+      {compact && photoList.length > 1 && <div className="photo-cycle-controls" role="group" aria-label={`${species.name} catch photos`} onMouseEnter={() => { pauseCycle.current = true }} onMouseLeave={() => { pauseCycle.current = false }} onFocus={() => { pauseCycle.current = true }} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) pauseCycle.current = false }}>
+        <button type="button" onClick={() => stepPhoto(-1)} aria-label="Previous photo">‹</button>
+        <span aria-live="off">{activePhotoIndex + 1} / {photoList.length}</span>
+        <button type="button" onClick={() => stepPhoto(1)} aria-label="Next photo">›</button>
+      </div>}
       {compact && expanded && <div className="compact-details"><p><b>How to rig:</b> {label(species.rig)}</p><p><b>Handling:</b> {label(species.handling)}</p><p><b>Limits:</b> {label(regulations.species[species.id]?.notes, 'Check TPWD before keeping')}</p></div>}
     </article>
   )
