@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { get, set } from 'idb-keyval'
 import Screen from '../components/Screen'
 import SpeciesCard from '../components/SpeciesCard'
@@ -13,6 +14,24 @@ const fishFactSources = {
   'red-drum': 'https://tpwd.texas.gov/huntwild/wild/species/reddrum/',
   'speckled-trout': 'https://tpwd.texas.gov/huntwild/wild/species/strout/',
   'hardhead-catfish': 'https://tpwd.texas.gov/fishing/sea-center-texas/flora-fauna-guide/bays-and-estuaries/bay-animals/hardhead-catfish/',
+}
+
+// Pop-ups render on <body> so they center on the visible screen (the app shell's backdrop-filter
+// would otherwise pin position: fixed to the shell), and the page can't scroll behind them.
+function Modal({ onClose, children }) {
+  useEffect(() => {
+    const { documentElement: html, body } = document
+    const previous = [html.style.overflow, body.style.overflow]
+    html.style.overflow = 'hidden'
+    body.style.overflow = 'hidden'
+    const closeOnEscape = (event) => { if (event.key === 'Escape') onClose() }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => {
+      ;[html.style.overflow, body.style.overflow] = previous
+      window.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [onClose])
+  return createPortal(<div className="modal-scrim" role="presentation" onClick={(event) => { if (event.target === event.currentTarget) onClose() }}>{children}</div>, document.body)
 }
 
 export default function Deck() {
@@ -57,6 +76,9 @@ export default function Deck() {
     })))
     setPhotos(loadedPhotos.filter(Boolean))
   }
+  const closeLogging = useCallback(() => setLogging(false), [])
+  const closeClue = useCallback(() => setClueId(null), [])
+  const closeFish = useCallback(() => setSelectedFishId(null), [])
   const clue = species.find((item) => item.id === clueId)
   const selectedFish = species.find((item) => item.id === selectedFishId)
 
@@ -77,7 +99,7 @@ export default function Deck() {
         })}</div>}
         <p className="deck-private-note">Your catches and photos stay on this device.</p>
       </div>
-      {logging && <div className="modal-scrim" role="presentation" onClick={(event) => { if (event.target === event.currentTarget) setLogging(false) }}>
+      {logging && <Modal onClose={closeLogging}>
         <form className="catch-modal" onSubmit={saveCatch} role="dialog" aria-modal="true" aria-labelledby="catch-title">
           <button type="button" className="modal-close" onClick={() => setLogging(false)} aria-label="Close">×</button><h2 id="catch-title">Log your catch</h2><p className="muted">Catch-and-release counts.</p>
           <input ref={fileRef} className="visually-hidden" type="file" accept="image/*" multiple onChange={(event) => { readPhotos(event.target.files); event.target.value = '' }} aria-label="Choose catch photos" />
@@ -85,17 +107,17 @@ export default function Deck() {
           <label className="species-select-label" htmlFor="caught-species">Which one looks like yours?</label><select id="caught-species" value={speciesId} onChange={(event) => setSpeciesId(event.target.value)} required><option value="">Choose a fish…</option>{species.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select>
           <button className="button button-dark save-catch-button" type="submit" disabled={!photos.length || !speciesId}>Add to my deck <span>→</span></button>
         </form>
-      </div>}
-      {clue && <div className="modal-scrim" role="presentation" onClick={(event) => { if (event.target === event.currentTarget) setClueId(null) }}><section className="clue-modal" role="dialog" aria-modal="true" aria-labelledby="clue-title">
+      </Modal>}
+      {clue && <Modal onClose={closeClue}><section className="clue-modal" role="dialog" aria-modal="true" aria-labelledby="clue-title">
         <button type="button" className="modal-close" onClick={() => setClueId(null)} aria-label="Close">×</button><h2 id="clue-title">How to meet a {clue.name}</h2><div className="clue-tip"><b>{clue.bait?.length ? `Bait: ${clue.bait.join(' or ')}` : 'Bait information unavailable'}</b></div><div className="clue-tip"><b>{clue.howTo || 'Fish from shore or pier and watch your line.'}</b></div><button className="button button-dark save-catch-button" onClick={() => { setClueId(null); setLogging(true) }}>Log a catch <span>→</span></button>
-      </section></div>}
-      {selectedFish && <div className="modal-scrim" role="presentation" onClick={(event) => { if (event.target === event.currentTarget) setSelectedFishId(null) }}><section className="fish-detail-modal" role="dialog" aria-modal="true" aria-labelledby="fish-detail-title">
+      </section></Modal>}
+      {selectedFish && <Modal onClose={closeFish}><section className="fish-detail-modal" role="dialog" aria-modal="true" aria-labelledby="fish-detail-title">
         <button type="button" className="modal-close" onClick={() => setSelectedFishId(null)} aria-label="Close">×</button>
         <img className="fish-detail-photo" src={selectedPhoto || photosBySpecies[selectedFish.id]?.[0] || selectedFish.photo} alt={`${selectedFish.name} catch`} />
         <h2 id="fish-detail-title">{selectedFish.name}</h2>
         {selectedFish.funFact && <div className="fish-fact-panel"><span>FISH FACT</span><p>{selectedFish.funFact}</p><a href={fishFactSources[selectedFish.id]} target="_blank" rel="noreferrer">Texas Parks &amp; Wildlife ↗</a></div>}
         {selectedFish.bait?.length > 0 && <p className="fish-detail-bait"><b>Bait:</b> {selectedFish.bait.join(' · ')}</p>}
-      </section></div>}
+      </section></Modal>}
     </Screen>
   )
 }
