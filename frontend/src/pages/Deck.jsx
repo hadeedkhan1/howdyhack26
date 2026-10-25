@@ -43,6 +43,7 @@ export default function Deck() {
   const [clueId, setClueId] = useState(null)
   const [selectedFishId, setSelectedFishId] = useState(null)
   const [selectedPhoto, setSelectedPhoto] = useState(null)
+  const [saveFailed, setSaveFailed] = useState(false)
   const fileRef = useRef(null)
 
   useEffect(() => {
@@ -59,10 +60,17 @@ export default function Deck() {
   const saveCatch = async (event) => {
     event.preventDefault()
     if (!speciesId || !photos.length) return
-    const updated = [...catches, { id: crypto.randomUUID(), speciesId, photo: photos[0], photos, caughtAt: new Date().toISOString() }]
+    // crypto.randomUUID only exists on HTTPS/localhost, so a phone on the dev server's LAN address needs a fallback.
+    const id = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`
+    const updated = [...catches, { id, speciesId, photo: photos[0], photos, caughtAt: new Date().toISOString() }]
     setCatches(updated)
-    await set(STORAGE_KEY, updated)
     setLogging(false)
+    try {
+      await set(STORAGE_KEY, updated)
+      setSaveFailed(false)
+    } catch {
+      setSaveFailed(true)
+    }
     setPhotos([])
     setSpeciesId('')
   }
@@ -97,7 +105,7 @@ export default function Deck() {
             {count ? <div className="collected-card"><span className="collected-count" aria-label={`${count} ${count === 1 ? 'catch' : 'catches'}`}>{count}×</span><SpeciesCard species={item} compact catchPhotos={photosBySpecies[item.id]} onClick={(photo) => { setSelectedFishId(item.id); setSelectedPhoto(photo || null) }} /></div> : <SpeciesCard species={item} mode="silhouette" compact onClick={() => setClueId(item.id)} />}
           </div>
         })}</div>}
-        <p className="deck-private-note">Your catches and photos stay on this device.</p>
+        <p className="deck-private-note">{saveFailed ? "Couldn't save to this device. Your newest catch will be gone if you leave this page." : 'Your catches and photos stay on this device.'}</p>
       </div>
       {logging && <Modal onClose={closeLogging}>
         <form className="catch-modal" onSubmit={saveCatch} role="dialog" aria-modal="true" aria-labelledby="catch-title">
