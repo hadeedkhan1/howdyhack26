@@ -827,6 +827,10 @@ body { background: #102f35; }
   .plan-slider-prompt { font-size: 10px; letter-spacing: .65px; }
 }
 
+/* Leave a small gap between the last panel and the floating tab bar: nav offset + 82px nav + 14px. */
+.app-shell.has-nav { padding-bottom: calc(max(14px, env(safe-area-inset-bottom)) + 96px); }
+
 @media (min-width: 700px) {
   .bottom-nav { bottom: 30px; }
+  .app-shell.has-nav { padding-bottom: 126px; }
 }
