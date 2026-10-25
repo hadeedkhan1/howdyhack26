@@ -328,6 +328,10 @@ a { color: inherit; }
 .likely-item .card-title-row { align-items: center; }
 .likely-item .card-bait { font-size: 11px; }
 .likely-item .card-main { height: auto; }
+.likely-item .species-card.compact.expanded .card-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto; }
+.likely-item .species-card.compact.expanded .card-rank { grid-column: 1; grid-row: 1; }
+.likely-item .species-card.compact.expanded .card-art { grid-column: 1; grid-row: 2; width: 100%; height: 190px; min-height: 190px; margin: 7px 0 10px; border-radius: 13px; }
+.likely-item .species-card.compact.expanded .card-information { grid-column: 1; grid-row: 3; }
 .compact-details { padding: 0 10px 10px; color: #52685f; font-size: 11px; line-height: 1.5; }
 .compact-details p { margin: 4px 0; }
 .compact-details .card-source { margin: 7px 0 0; }

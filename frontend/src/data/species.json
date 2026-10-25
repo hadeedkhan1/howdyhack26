@@ -3,7 +3,7 @@
     "id": "croaker",
     "name": "Atlantic croaker",
     "aka": [],
-    "photo": "",
+    "photo": "https://cdn.coastalscience.noaa.gov/csmedia/2024/01/Atlantic-Croaker-Picture-David-Scheurer-NOAA-Federal-scaled.jpg",
     "silhouette": "",
     "spotTypes": [],
     "waterTempF": [
@@ -22,13 +22,13 @@
       "sourceUrl": ""
     },
     "funFact": "Atlantic croaker feed on small fish, worms, crabs, shrimp and shellfish along bay bottoms.",
-    "photoCredit": ""
+    "photoCredit": "NOAA"
   },
   {
     "id": "whiting",
     "name": "Whiting (southern kingfish)",
     "aka": [],
-    "photo": "",
+    "photo": "https://tpwd.texas.gov/fishing/sea-center-texas/flora-fauna-guide/images/southernkingfish_med.jpg",
     "silhouette": "",
     "spotTypes": [],
     "waterTempF": [
@@ -48,13 +48,13 @@
       "sourceUrl": ""
     },
     "funFact": "Along the Texas coast, both southern kingfish and Gulf kingfish are called whiting.",
-    "photoCredit": ""
+    "photoCredit": "TPWD"
   },
   {
     "id": "sheepshead",
     "name": "Sheepshead",
     "aka": [],
-    "photo": "",
+    "photo": "https://tpwd.texas.gov/huntwild/wild/images/fish/sheephd.jpg",
     "silhouette": "",
     "spotTypes": [],
     "waterTempF": [
@@ -73,14 +73,14 @@
       "note": "NEEDS CHECK",
       "sourceUrl": ""
     },
-    "funFact": "Its human-like front teeth crush barnacles and fiddler crabs; its stripes earned it the nickname “convict fish.”",
-    "photoCredit": ""
+    "funFact": "Its human-like front teeth crush barnacles and fiddler crabs; its stripes earned it the nickname \u201cconvict fish.\u201d",
+    "photoCredit": "TPWD"
   },
   {
     "id": "black-drum",
     "name": "Black drum",
     "aka": [],
-    "photo": "",
+    "photo": "https://tpwd.texas.gov/huntwild/wild/images/fish/bldrumsm.jpg",
     "silhouette": "",
     "spotTypes": [],
     "waterTempF": [
@@ -100,13 +100,13 @@
       "sourceUrl": ""
     },
     "funFact": "Young black drum have dark vertical bars that often fade as they grow.",
-    "photoCredit": ""
+    "photoCredit": "TPWD"
   },
   {
     "id": "red-drum",
     "name": "Red drum (redfish)",
     "aka": [],
-    "photo": "",
+    "photo": "https://tpwd.texas.gov/huntwild/wild/images/fish/reddrum2.jpg",
     "silhouette": "",
     "spotTypes": [],
     "waterTempF": [
@@ -126,13 +126,13 @@
       "sourceUrl": ""
     },
     "funFact": "The dark spot near its tail may fool predators into striking the wrong end.",
-    "photoCredit": ""
+    "photoCredit": "TPWD"
   },
   {
     "id": "speckled-trout",
     "name": "Speckled trout (spotted seatrout)",
     "aka": [],
-    "photo": "",
+    "photo": "https://tpwd.texas.gov/huntwild/wild/images/fish/spseatrout.jpg",
     "silhouette": "",
     "spotTypes": [],
     "waterTempF": [
@@ -152,13 +152,13 @@
       "sourceUrl": ""
     },
     "funFact": "Speckled trout belong to the drum family, alongside croaker and red drum.",
-    "photoCredit": ""
+    "photoCredit": "TPWD"
   },
   {
     "id": "hardhead-catfish",
     "name": "Hardhead catfish",
     "aka": [],
-    "photo": "",
+    "photo": "https://upload.wikimedia.org/wikipedia/commons/0/03/Arius_felis.jpg",
     "silhouette": "",
     "spotTypes": [],
     "waterTempF": [
@@ -178,6 +178,6 @@
       "sourceUrl": ""
     },
     "funFact": "Its six whisker-like barbels help it find crabs, fish and shrimp.",
-    "photoCredit": ""
+    "photoCredit": "Edgar Ravenswood Waite \u00b7 public domain"
   }
 ]
