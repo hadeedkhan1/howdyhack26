@@ -37,10 +37,12 @@ function ArcArrow({ direction }) {
 export default function SpeciesCard({ species, mode = 'face', compact = false, likelihood, catchPhoto, catchPhotos, onClick }) {
   const [expanded, setExpanded] = useState(false)
   const [photoIndex, setPhotoIndex] = useState(0)
+  const [failedPhoto, setFailedPhoto] = useState(null)
   const pauseCycle = useRef(false)
   const photoList = catchPhotos?.length ? catchPhotos : catchPhoto ? [catchPhoto] : []
   const activePhotoIndex = photoList.length ? photoIndex % photoList.length : 0
   const activePhoto = photoList[activePhotoIndex] || species?.photo
+  const showPhoto = activePhoto && failedPhoto !== activePhoto
   const rank = species ? ranks[Math.max(0, Object.keys(regulations.species).indexOf(species.id))] || '★' : '★'
   const suit = species ? suits[Math.max(0, Object.keys(regulations.species).indexOf(species.id)) % suits.length] : '♣'
 
@@ -73,7 +75,7 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
     <article className={`species-card face-card ${compact ? 'compact' : ''} ${expanded ? 'expanded' : ''} ${compact && photoList.length > 1 ? 'has-photo-controls' : ''}`}>
       <button type="button" className="card-main" onClick={() => { if (onClick) onClick(photoList.length ? activePhoto : undefined); else setExpanded(!expanded) }} aria-expanded={onClick ? undefined : expanded}>
         <span className="card-rank">{rank}<small>{suit}</small></span>
-        <div className={`card-art ${photoList.length ? 'catch-photo-art' : ''}`}>{activePhoto ? <img key={activePhotoIndex} src={activePhoto} alt={`${species.name} catch photo ${activePhotoIndex + 1} of ${photoList.length}`} /> : <FishMark />}</div>
+        <div className={`card-art ${photoList.length ? 'catch-photo-art' : ''}`}>{showPhoto ? <img key={activePhoto} src={activePhoto} alt={photoList.length ? `${species.name} catch photo ${activePhotoIndex + 1} of ${photoList.length}` : species.name} title={!photoList.length ? `Photo: ${species.photoCredit}` : undefined} onError={() => setFailedPhoto(activePhoto)} /> : <FishMark />}</div>
         <div className="card-information"><div className="card-title-row"><h3>{species.name}</h3>{likelihood && <span className={`likelihood likelihood-${likelihood}`}>{likelihood}</span>}</div>
           <p className="card-bait"><span className="mini-icon">⌁</span> {species.bait?.length ? species.bait.join(' · ') : 'Bait details soon'}</p>
           {!compact && <><div className="card-rule" /><p className="card-detail"><b>Rig</b><span>{label(species.rig)}</span></p><p className="card-detail"><b>How to fish</b><span>{label(species.howTo)}</span></p><p className="card-detail"><b>Limits</b><span>{limitSummary(regulations.species[species.id])}</span></p><p className="card-detail"><b>Handling</b><span>{label(species.handling)}</span></p>
@@ -85,7 +87,7 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
         <span aria-live="off">{activePhotoIndex + 1}/{photoList.length}</span>
         <button type="button" onClick={() => stepPhoto(1)} aria-label="Next photo"><ArcArrow direction="right" /></button>
       </div>}
-      {compact && expanded && <div className="compact-details"><p><b>How to rig:</b> {label(species.rig)}</p><p><b>How to fish:</b> {label(species.howTo)}</p><p><b>Handling:</b> {label(species.handling)}</p><p><b>Limits:</b> {limitSummary(regulations.species[species.id])}</p><a className="card-source" href={regulations.species[species.id]?.sourceUrl || regulations.sourceUrl} target="_blank" rel="noreferrer">Texas rules · updated {regulations.updated} ↗</a></div>}
+      {compact && expanded && <div className="compact-details"><p><b>How to rig:</b> {label(species.rig)}</p><p><b>How to fish:</b> {label(species.howTo)}</p><p><b>Handling:</b> {label(species.handling)}</p><p><b>Limits:</b> {limitSummary(regulations.species[species.id])}</p>{species.photoCredit && <p className="card-photo-credit">Photo: {species.photoCredit}</p>}<a className="card-source" href={regulations.species[species.id]?.sourceUrl || regulations.sourceUrl} target="_blank" rel="noreferrer">Texas rules · updated {regulations.updated} ↗</a></div>}
       {!compact && <a className="card-source" href={regulations.species[species.id]?.sourceUrl || regulations.sourceUrl} target="_blank" rel="noreferrer">Texas rules · updated {regulations.updated} ↗</a>}
     </article>
   )
