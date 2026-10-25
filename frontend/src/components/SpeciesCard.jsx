@@ -30,7 +30,7 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
     if (photoList.length < 2 || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined
     const timer = window.setInterval(() => {
       if (!pauseCycle.current) setPhotoIndex((index) => (index + 1) % photoList.length)
-    }, 3200)
+    }, 3500)
     return () => window.clearInterval(timer)
   }, [species?.id, photoList.length])
 
@@ -53,7 +53,7 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
 
   return (
     <article className={`species-card face-card ${compact ? 'compact' : ''} ${expanded ? 'expanded' : ''}`}>
-      <button type="button" className="card-main" onClick={() => { setExpanded(!expanded); onClick?.() }} aria-expanded={expanded}>
+      <button type="button" className="card-main" onClick={() => { if (onClick) onClick(); else setExpanded(!expanded) }} aria-expanded={onClick ? undefined : expanded}>
         <span className="card-rank">{rank}<small>{suit}</small></span>
         <div className={`card-art ${photoList.length ? 'catch-photo-art' : ''}`}>{activePhoto ? <img key={activePhotoIndex} src={activePhoto} alt={`${species.name} catch photo ${activePhotoIndex + 1} of ${photoList.length}`} /> : <FishMark />}</div>
         <div className="card-information"><div className="card-title-row"><h3>{species.name}</h3>{likelihood && <span className={`likelihood likelihood-${likelihood}`}>{likelihood}</span>}</div>
