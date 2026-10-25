@@ -631,8 +631,6 @@ body { color: var(--ink); }
   border-radius: 999px;
   background: linear-gradient(145deg, rgba(255, 255, 255, .8), rgba(211, 240, 233, .67));
   box-shadow: 0 4px 16px #286c6824, inset 0 1px #ffffff, inset 0 -1px #8acbc338;
-  backdrop-filter: blur(18px) saturate(190%);
-  -webkit-backdrop-filter: blur(18px) saturate(190%);
   pointer-events: none;
 }
 .nav-indicator.is-sliding { animation: nav-indicator-slide .56s cubic-bezier(.22, 1, .36, 1) both; }
@@ -660,8 +658,10 @@ body { color: var(--ink); }
   background: linear-gradient(90deg, transparent, #fff, #cffff8, #fff, transparent);
   box-shadow: 0 1px 5px #ffffffb3, 0 0 12px #b6f5e8a8;
 }
-.bottom-nav .nav-item { z-index: 1; background: transparent; }
+/* Own compositing layer so Safari never paints the glass pill over the labels. */
+.bottom-nav .nav-item { z-index: 2; background: transparent; transform: translateZ(0); }
 .bottom-nav .nav-item:hover { background: #ffffff24; }
+.bottom-nav .nav-item:active { transform: translateZ(0) scale(.96); }
 .bottom-nav .nav-item.active {
   border-color: transparent;
   background: transparent;
