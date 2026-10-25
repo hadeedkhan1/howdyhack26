@@ -4,6 +4,16 @@ import { regulations } from '../services/content'
 const ranks = ['A', '2', '3', '4', '5', '6', '7']
 const suits = ['♠', '♥', '♦', '♣']
 const label = (value, fallback = 'Details coming soon') => value && value !== 'NEEDS CHECK' ? value : fallback
+const limitSummary = (rule) => {
+  if (!rule) return 'Check current TPWD rules before keeping fish.'
+  if (rule.dailyBag == null) return label(rule.notes, 'Check current TPWD rules before keeping fish.')
+  const size = rule.minIn && rule.maxIn
+    ? `${rule.minIn}–${rule.maxIn} inches.`
+    : rule.minIn
+      ? `Minimum ${rule.minIn} inches; no maximum size.`
+      : ''
+  return [`${rule.dailyBag} per angler per day.`, size, label(rule.notes, '')].filter(Boolean).join(' ')
+}
 
 function FishMark() {
   return <svg className="fish-mark" viewBox="0 0 160 90" role="img" aria-label="Fish illustration">
@@ -66,7 +76,7 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
         <div className={`card-art ${photoList.length ? 'catch-photo-art' : ''}`}>{activePhoto ? <img key={activePhotoIndex} src={activePhoto} alt={`${species.name} catch photo ${activePhotoIndex + 1} of ${photoList.length}`} /> : <FishMark />}</div>
         <div className="card-information"><div className="card-title-row"><h3>{species.name}</h3>{likelihood && <span className={`likelihood likelihood-${likelihood}`}>{likelihood}</span>}</div>
           <p className="card-bait"><span className="mini-icon">⌁</span> {species.bait?.length ? species.bait.join(' · ') : 'Bait details soon'}</p>
-          {!compact && <><div className="card-rule" /><p className="card-detail"><b>Rig</b><span>{label(species.rig)}</span></p><p className="card-detail"><b>Keep / release</b><span>{label(regulations.species[species.id]?.notes, 'Check current TPWD rules')}</span></p><p className="card-detail"><b>Good to know</b><span>{label(species.handling)}</span></p>
+          {!compact && <><div className="card-rule" /><p className="card-detail"><b>Rig</b><span>{label(species.rig)}</span></p><p className="card-detail"><b>How to fish</b><span>{label(species.howTo)}</span></p><p className="card-detail"><b>Limits</b><span>{limitSummary(regulations.species[species.id])}</span></p><p className="card-detail"><b>Handling</b><span>{label(species.handling)}</span></p>
             <p className="eat-note"><span>{species.eat?.ok === true ? '✓' : species.eat?.ok === false ? '!' : '↗'}</span> {species.eat?.ok == null ? 'Check local advisories before eating' : species.eat.note}</p></>}
         </div>
       </button>
@@ -75,7 +85,8 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
         <span aria-live="off">{activePhotoIndex + 1}/{photoList.length}</span>
         <button type="button" onClick={() => stepPhoto(1)} aria-label="Next photo"><ArcArrow direction="right" /></button>
       </div>}
-      {compact && expanded && <div className="compact-details"><p><b>How to rig:</b> {label(species.rig)}</p><p><b>Handling:</b> {label(species.handling)}</p><p><b>Limits:</b> {label(regulations.species[species.id]?.notes, 'Check TPWD before keeping')}</p></div>}
+      {compact && expanded && <div className="compact-details"><p><b>How to rig:</b> {label(species.rig)}</p><p><b>How to fish:</b> {label(species.howTo)}</p><p><b>Handling:</b> {label(species.handling)}</p><p><b>Limits:</b> {limitSummary(regulations.species[species.id])}</p><a className="card-source" href={regulations.species[species.id]?.sourceUrl || regulations.sourceUrl} target="_blank" rel="noreferrer">Texas rules · updated {regulations.updated} ↗</a></div>}
+      {!compact && <a className="card-source" href={regulations.species[species.id]?.sourceUrl || regulations.sourceUrl} target="_blank" rel="noreferrer">Texas rules · updated {regulations.updated} ↗</a>}
     </article>
   )
 }
