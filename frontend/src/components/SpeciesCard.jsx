@@ -64,7 +64,7 @@ export default function SpeciesCard({ species, mode = 'face', compact = false, l
       </button>
       {compact && photoList.length > 1 && <div className="photo-cycle-controls" role="group" aria-label={`${species.name} catch photos`} onMouseEnter={() => { pauseCycle.current = true }} onMouseLeave={() => { pauseCycle.current = false }} onFocus={() => { pauseCycle.current = true }} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) pauseCycle.current = false }}>
         <button type="button" onClick={() => stepPhoto(-1)} aria-label="Previous photo">‹</button>
-        <span aria-live="off">{activePhotoIndex + 1} / {photoList.length}</span>
+        <span aria-live="off">{activePhotoIndex + 1}/{photoList.length}</span>
         <button type="button" onClick={() => stepPhoto(1)} aria-label="Next photo">›</button>
       </div>}
       {compact && expanded && <div className="compact-details"><p><b>How to rig:</b> {label(species.rig)}</p><p><b>Handling:</b> {label(species.handling)}</p><p><b>Limits:</b> {label(regulations.species[species.id]?.notes, 'Check TPWD before keeping')}</p></div>}
