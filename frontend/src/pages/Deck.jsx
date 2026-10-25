@@ -10,7 +10,7 @@ export default function Deck() {
   const [catches, setCatches] = useState([])
   const [loaded, setLoaded] = useState(false)
   const [logging, setLogging] = useState(false)
-  const [photo, setPhoto] = useState('')
+  const [photos, setPhotos] = useState([])
   const [speciesId, setSpeciesId] = useState('')
   const [clueId, setClueId] = useState(null)
   const fileRef = useRef(null)
@@ -20,25 +20,31 @@ export default function Deck() {
   }, [])
 
   const counts = useMemo(() => catches.reduce((all, entry) => ({ ...all, [entry.speciesId]: (all[entry.speciesId] || 0) + 1 }), {}), [catches])
-  const latestCatchBySpecies = useMemo(() => catches.reduce((latest, entry) => {
-    if (!latest[entry.speciesId] || entry.caughtAt > latest[entry.speciesId].caughtAt) latest[entry.speciesId] = entry
-    return latest
+  const photosBySpecies = useMemo(() => [...catches].reverse().reduce((all, entry) => {
+    const entries = Array.isArray(entry.photos) ? entry.photos : entry.photo ? [entry.photo] : []
+    const photosForSpecies = all[entry.speciesId] || (all[entry.speciesId] = [])
+    entries.forEach((image) => { if (image && !photosForSpecies.includes(image)) photosForSpecies.push(image) })
+    return all
   }, {}), [catches])
   const saveCatch = async (event) => {
     event.preventDefault()
-    if (!speciesId || !photo) return
-    const updated = [...catches, { id: crypto.randomUUID(), speciesId, photo, caughtAt: new Date().toISOString() }]
+    if (!speciesId || !photos.length) return
+    const updated = [...catches, { id: crypto.randomUUID(), speciesId, photo: photos[0], photos, caughtAt: new Date().toISOString() }]
     setCatches(updated)
     await set(STORAGE_KEY, updated)
     setLogging(false)
-    setPhoto('')
+    setPhotos([])
     setSpeciesId('')
   }
-  const readPhoto = (file) => {
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => setPhoto(String(reader.result))
-    reader.readAsDataURL(file)
+  const readPhotos = async (files) => {
+    if (!files?.length) return
+    const loadedPhotos = await Promise.all(Array.from(files).map((file) => new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(String(reader.result))
+      reader.onerror = () => resolve(null)
+      reader.readAsDataURL(file)
+    })))
+    setPhotos(loadedPhotos.filter(Boolean))
   }
   const clue = species.find((item) => item.id === clueId)
 
@@ -54,7 +60,7 @@ export default function Deck() {
         {!loaded ? <div className="loading-card" role="status"><span className="skeleton-line wide" /><span className="skeleton-block" /></div> : <div className="deck-grid">{species.map((item) => {
           const count = counts[item.id] || 0
           return <div className="deck-card-wrap" key={item.id}>
-            {count ? <div className="collected-card"><span className="collected-count" aria-label={`${count} ${count === 1 ? 'catch' : 'catches'}`}>{count}×</span><SpeciesCard species={item} compact catchPhoto={latestCatchBySpecies[item.id]?.photo} /></div> : <SpeciesCard species={item} mode="silhouette" compact onClick={() => setClueId(item.id)} />}
+            {count ? <div className="collected-card"><span className="collected-count" aria-label={`${count} ${count === 1 ? 'catch' : 'catches'}`}>{count}×</span><SpeciesCard species={item} compact catchPhotos={photosBySpecies[item.id]} /></div> : <SpeciesCard species={item} mode="silhouette" compact onClick={() => setClueId(item.id)} />}
           </div>
         })}</div>}
         <p className="deck-private-note">Your catches and photos stay on this device.</p>
@@ -62,10 +68,10 @@ export default function Deck() {
       {logging && <div className="modal-scrim" role="presentation" onClick={(event) => { if (event.target === event.currentTarget) setLogging(false) }}>
         <form className="catch-modal" onSubmit={saveCatch} role="dialog" aria-modal="true" aria-labelledby="catch-title">
           <button type="button" className="modal-close" onClick={() => setLogging(false)} aria-label="Close">×</button><h2 id="catch-title">Log your catch</h2><p className="muted">Catch-and-release counts.</p>
-          <input ref={fileRef} className="visually-hidden" type="file" accept="image/*" capture="environment" onChange={(event) => readPhoto(event.target.files?.[0])} />
-          <button type="button" className={`photo-picker ${photo ? 'has-photo' : ''}`} onClick={() => fileRef.current?.click()}>{photo ? <img src={photo} alt="Selected catch" /> : <><span>＋</span><b>Take or choose a photo</b></>}</button>
+          <input ref={fileRef} className="visually-hidden" type="file" accept="image/*" multiple onChange={(event) => { readPhotos(event.target.files); event.target.value = '' }} aria-label="Choose catch photos" />
+          <button type="button" className={`photo-picker ${photos.length ? 'has-photo' : ''}`} onClick={() => fileRef.current?.click()}>{photos.length ? <div className="photo-picker-preview">{photos.slice(0, 4).map((image, index) => <img src={image} alt={`Selected catch ${index + 1}`} key={`${index}-${image.length}`} />)}{photos.length > 4 && <span className="photo-picker-more">+{photos.length - 4}</span>}<b>{photos.length} {photos.length === 1 ? 'photo' : 'photos'} selected</b></div> : <><span>＋</span><b>Take or choose photos</b></>}</button>
           <label className="species-select-label" htmlFor="caught-species">Which one looks like yours?</label><select id="caught-species" value={speciesId} onChange={(event) => setSpeciesId(event.target.value)} required><option value="">Choose a fish…</option>{species.map((item) => <option value={item.id} key={item.id}>{item.name}</option>)}</select>
-          <button className="button button-dark save-catch-button" type="submit" disabled={!photo || !speciesId}>Add to my deck <span>→</span></button>
+          <button className="button button-dark save-catch-button" type="submit" disabled={!photos.length || !speciesId}>Add to my deck <span>→</span></button>
         </form>
       </div>}
       {clue && <div className="modal-scrim" role="presentation" onClick={(event) => { if (event.target === event.currentTarget) setClueId(null) }}><section className="clue-modal" role="dialog" aria-modal="true" aria-labelledby="clue-title">
