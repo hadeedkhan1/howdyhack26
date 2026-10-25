@@ -1,55 +1,55 @@
 {
-  "updated": "NEEDS CHECK",
-  "sourceUrl": "https://tpwd.texas.gov/regulations/outdoor-annual/",
+  "updated": "2026-10-25",
+  "sourceUrl": "https://tpwd.texas.gov/regulations/outdoor-annual/fishing/saltwater-fishing/bag-length-limits",
   "species": {
     "croaker": {
       "minIn": null,
       "maxIn": null,
       "dailyBag": null,
-      "notes": "NEEDS CHECK",
-      "sourceUrl": ""
+      "notes": "No statewide bag or length limit is listed. Check current TPWD rules before keeping fish.",
+      "sourceUrl": "https://tpwd.texas.gov/regulations/outdoor-annual/fishing/saltwater-fishing/bag-length-limits"
     },
     "whiting": {
       "minIn": null,
       "maxIn": null,
       "dailyBag": null,
-      "notes": "NEEDS CHECK",
-      "sourceUrl": ""
+      "notes": "No statewide bag or length limit is listed. Check current TPWD rules before keeping fish.",
+      "sourceUrl": "https://tpwd.texas.gov/regulations/outdoor-annual/fishing/saltwater-fishing/bag-length-limits"
     },
     "sheepshead": {
-      "minIn": null,
+      "minIn": 15,
       "maxIn": null,
-      "dailyBag": null,
-      "notes": "NEEDS CHECK",
-      "sourceUrl": ""
+      "dailyBag": 5,
+      "notes": "Possession limit: 10.",
+      "sourceUrl": "https://tpwd.texas.gov/regulations/outdoor-annual/fishing/saltwater-fishing/bag-length-limits/sheepshead-bag-length-limits"
     },
     "black-drum": {
-      "minIn": null,
-      "maxIn": null,
-      "dailyBag": null,
-      "notes": "NEEDS CHECK",
-      "sourceUrl": ""
+      "minIn": 14,
+      "maxIn": 30,
+      "dailyBag": 5,
+      "notes": "Fish over 30 and under 52 inches must be released. One over 52 inches may be kept per day and counts toward the bag and possession limits. Possession limit: 10.",
+      "sourceUrl": "https://tpwd.texas.gov/regulations/outdoor-annual/fishing/saltwater-fishing/bag-length-limits/drum-bag-length-limits/"
     },
     "red-drum": {
-      "minIn": null,
-      "maxIn": null,
-      "dailyBag": null,
-      "notes": "NEEDS CHECK",
-      "sourceUrl": ""
+      "minIn": 20,
+      "maxIn": 28,
+      "dailyBag": 3,
+      "notes": "Fish over 28 inches require a valid Red Drum or Bonus Red Drum tag; one of each tag may be used per license year. Possession limit: 6.",
+      "sourceUrl": "https://tpwd.texas.gov/regulations/outdoor-annual/fishing/saltwater-fishing/bag-length-limits/drum-bag-length-limits/"
     },
     "speckled-trout": {
-      "minIn": null,
-      "maxIn": null,
-      "dailyBag": null,
-      "notes": "NEEDS CHECK",
-      "sourceUrl": ""
+      "minIn": 15,
+      "maxIn": 20,
+      "dailyBag": 3,
+      "notes": "Fish over 20 and under 28 inches must be released. One over 28 inches may be kept with each valid Spotted Seatrout and Bonus Spotted Seatrout tag per license year. Possession limit: 6.",
+      "sourceUrl": "https://tpwd.texas.gov/regulations/outdoor-annual/fishing/saltwater-fishing/bag-length-limits/seatrout-bag-length-limits"
     },
     "hardhead-catfish": {
       "minIn": null,
       "maxIn": null,
       "dailyBag": null,
-      "notes": "NEEDS CHECK",
-      "sourceUrl": ""
+      "notes": "No statewide bag or length limit is listed. Check current TPWD rules before keeping fish.",
+      "sourceUrl": "https://tpwd.texas.gov/regulations/outdoor-annual/fishing/saltwater-fishing/bag-length-limits"
     }
   },
   "license": {

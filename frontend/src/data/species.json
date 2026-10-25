@@ -10,10 +10,12 @@
       null,
       null
     ],
-    "bait": [],
-    "rig": "",
-    "howTo": "",
-    "handling": "",
+    "bait": [
+      "Gulf shrimp"
+    ],
+    "rig": "Bottom rig: put a small hook on a short leader, with a sinker above it to hold shrimp near the bottom.",
+    "howTo": "Cast near the bottom and watch for a light tap. Reel steadily once the line starts moving.",
+    "handling": "Wet your hands, support the fish, and keep it out of water only briefly. Use pliers to remove the hook.",
     "eat": {
       "ok": null,
       "note": "NEEDS CHECK",
@@ -33,10 +35,13 @@
       null,
       null
     ],
-    "bait": [],
-    "rig": "",
-    "howTo": "",
-    "handling": "",
+    "bait": [
+      "Gulf shrimp",
+      "sand fleas"
+    ],
+    "rig": "Bottom rig: use a small hook on a short leader with enough weight to hold on the sandy bottom.",
+    "howTo": "Cast into the surf or from a pier and keep the bait near the bottom. Reel in when the line starts to move.",
+    "handling": "Wet your hands and support the fish. If releasing it, remove the hook quickly and return it to the water.",
     "eat": {
       "ok": null,
       "note": "NEEDS CHECK",
@@ -56,10 +61,13 @@
       null,
       null
     ],
-    "bait": [],
-    "rig": "",
-    "howTo": "",
-    "handling": "",
+    "bait": [
+      "Fiddler crab",
+      "small shrimp"
+    ],
+    "rig": "Use a small hook and a pinch-on weight. Keep the bait close to pilings, rocks, or other hard surfaces.",
+    "howTo": "Lower the bait beside structure and watch closely for small bites; sheepshead often nibble before taking it.",
+    "handling": "Watch the sharp fin spines and gill-cover edge, and keep fingers clear of its strong teeth. Use pliers to unhook it.",
     "eat": {
       "ok": null,
       "note": "NEEDS CHECK",
@@ -79,10 +87,13 @@
       null,
       null
     ],
-    "bait": [],
-    "rig": "",
-    "howTo": "",
-    "handling": "",
+    "bait": [
+      "Gulf shrimp",
+      "blue crab"
+    ],
+    "rig": "Bottom rig: use a circle hook, short leader, and enough weight to hold bait on the bottom.",
+    "howTo": "Let the bait rest on the bottom near a channel edge or pier. Reel in smoothly when the line moves; avoid jerking hard.",
+    "handling": "Wet your hands, support the fish under its body, and avoid its gill covers. Keep it in the water when releasing it.",
     "eat": {
       "ok": null,
       "note": "NEEDS CHECK",
@@ -102,10 +113,13 @@
       null,
       null
     ],
-    "bait": [],
-    "rig": "",
-    "howTo": "",
-    "handling": "",
+    "bait": [
+      "Gulf shrimp",
+      "cut mullet"
+    ],
+    "rig": "Bottom rig: use a circle hook and sinker to keep shrimp or cut mullet near the bottom.",
+    "howTo": "Cast near a channel edge or through a moving-water area. Let the bait settle, then reel steadily when the line moves.",
+    "handling": "Wet your hands and support the fish horizontally. Keep fingers away from its gills and return released fish quickly.",
     "eat": {
       "ok": null,
       "note": "NEEDS CHECK",
@@ -125,10 +139,13 @@
       null,
       null
     ],
-    "bait": [],
-    "rig": "",
-    "howTo": "",
-    "handling": "",
+    "bait": [
+      "Gulf shrimp",
+      "shrimp-shaped soft lure"
+    ],
+    "rig": "Popping cork: suspend shrimp or a soft lure below a float. Adjust the leader so the bait hangs above the bottom.",
+    "howTo": "Cast near moving water, twitch the cork gently, then pause. Watch the float for a pull under.",
+    "handling": "Wet your hands, support the fish, and keep fingers clear of its teeth. Remove the hook quickly and release it gently.",
     "eat": {
       "ok": null,
       "note": "NEEDS CHECK",
@@ -148,10 +165,13 @@
       null,
       null
     ],
-    "bait": [],
-    "rig": "",
-    "howTo": "",
-    "handling": "",
+    "bait": [
+      "Gulf shrimp",
+      "cut bait"
+    ],
+    "rig": "Bottom rig: use a simple hook and sinker to keep bait near the bottom.",
+    "howTo": "Cast from shore or a pier and wait for the line to move. Check your bait often; catfish may strip it quickly.",
+    "handling": "Use long-nose pliers or a fish gripper. Never grab the sharp dorsal or side spines; their punctures are painful.",
     "eat": {
       "ok": null,
       "note": "NEEDS CHECK",

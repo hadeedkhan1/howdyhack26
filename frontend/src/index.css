@@ -310,6 +310,7 @@ a { color: inherit; }
 .card-rule { height: 1px; margin: 10px 0 8px; background: #d9dccf; }
 .card-detail { display: grid; grid-template-columns: 82px 1fr; gap: 5px; margin: 7px 0; color: #52685f; font-size: 11px; line-height: 1.4; }
 .card-detail b { color: #315b50; font-size: 11px; }
+.card-source { display: block; margin: 0 11px 10px; color: #397568; font-size: 10px; font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .eat-note { display: flex; gap: 6px; align-items: flex-start; margin: 9px 0 0; padding: 8px; border-radius: 9px; background: #e4eee3; color: #435f50; font-size: 11px; line-height: 1.4; }
 .eat-note span { font-weight: 900; }
 .likelihood { padding: 4px 6px; border-radius: 99px; background: #e5f0de; color: #55755e; font-size: 10px; font-weight: 750; text-transform: uppercase; }
@@ -329,6 +330,7 @@ a { color: inherit; }
 .likely-item .card-main { height: auto; }
 .compact-details { padding: 0 10px 10px; color: #52685f; font-size: 11px; line-height: 1.5; }
 .compact-details p { margin: 4px 0; }
+.compact-details .card-source { margin: 7px 0 0; }
 .silhouette-card { display: flex; flex-direction: column; justify-content: space-between; width: 100%; min-height: 270px; padding: 13px; border: 1px solid #1a4844; background: #1c4b48; color: #f3ecdb; text-align: left; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
 .silhouette-card:hover { transform: translateY(-3px); box-shadow: 0 13px 25px #193b3c21; }
 .silhouette-card .card-rank { color: #e2b477; }
